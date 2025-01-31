@@ -1,17 +1,15 @@
-
 import json
 import requests
 
-from pydantic import BaseModel, Field
 from typing import Optional
+from pydantic import BaseModel, Field
 
 from langchain.tools import StructuredTool
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.agents import AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-
-
-NETDATA_BASE_URL = "https://london3.my-netdata.io"
+from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 
 
 class GetNetdataInfoInput(BaseModel):
@@ -40,90 +38,157 @@ class GetNetdataChartDataInput(BaseModel):
     )
 
 
-def get_netdata_info(params: GetNetdataInfoInput = GetNetdataInfoInput()) -> str:
+class NetdataLLMAgent:
     """
-    Calls Netdata /api/v1/info to retrieve system info.
-    No input params are needed, so we accept an empty Pydantic model.
+    A wrapper class that creates a LangChain Agent with tools to interact
+    with a Netdata node and retrieve system/metrics information.
     """
-    url = f"{NETDATA_BASE_URL}/api/v1/info"
-    try:
+
+    def __init__(
+        self,
+        base_url: str = "https://london3.my-netdata.io",
+        model_name: str = "gpt-4o",
+    ):
+        self.base_url = base_url
+        self.model = ChatOpenAI(model=model_name)
+        self.memory = MemorySaver()
+
+        # -- Define the tools --
+        self.get_netdata_info_tool = StructuredTool.from_function(
+            name="get_netdata_info",
+            func=self._get_netdata_info,
+            description="Gets high-level system info from Netdata. No parameters required.",
+            args_schema=GetNetdataInfoInput,
+        )
+
+        self.get_netdata_charts_tool = StructuredTool.from_function(
+            name="get_netdata_charts",
+            func=self._get_netdata_charts,
+            description="Gets a list of available charts from Netdata. No parameters required.",
+            args_schema=GetNetdataChartsInput,
+        )
+
+        self.get_netdata_chart_info_tool = StructuredTool.from_function(
+            name="get_netdata_chart_info",
+            func=self._get_netdata_chart_info,
+            description=(
+                "Gets detailed info (e.g. dimensions) for a specific chart from Netdata. "
+                "Provide a chart name (e.g. 'cpu.cpu0')."
+            ),
+            args_schema=GetNetdataChartInfoInput,
+        )
+
+        self.get_netdata_chart_data_tool = StructuredTool.from_function(
+            name="get_netdata_chart_data",
+            func=self._get_netdata_chart_data,
+            description=(
+                "Gets data for a specific chart from Netdata. "
+                "Provide a chart name (e.g. 'cpu.cpu0'), 'after', and 'before' timestamps."
+            ),
+            args_schema=GetNetdataChartDataInput,
+        )
+
+        # -- Create the agent prompt --
+        prompt_text = (
+            "You are a helpful AI bot that allows users to interact with their Netdata "
+            "nodes and metrics to better understand their systems. You have the following tools:\n\n"
+            " - get_netdata_info()\n"
+            " - get_netdata_charts()\n"
+            " - get_netdata_chart_info()\n"
+            " - get_netdata_chart_data()\n\n"
+            "You can provide system info using get_netdata_info, list available charts "
+            "using get_netdata_charts, get individual chart info using get_netdata_chart_info, "
+            "and get chart data using get_netdata_chart_data."
+        )
+        prompt = ChatPromptTemplate([("system", prompt_text)])
+
+        # -- Create the agent executor --
+        self.agent_executor: AgentExecutor = create_react_agent(
+            model=self.model,
+            tools=[
+                self.get_netdata_info_tool,
+                self.get_netdata_charts_tool,
+                self.get_netdata_chart_info_tool,
+                self.get_netdata_chart_data_tool,
+            ],
+            checkpointer=self.memory,
+            prompt=prompt,
+        )
+
+    def _get_netdata_info(self, params: GetNetdataInfoInput) -> str:
+        """
+        Calls Netdata /api/v1/info to retrieve system info.
+        No input params are needed, so we accept an empty Pydantic model.
+        """
+        url = f"{self.base_url}/api/v1/info"
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
         r_json = resp.json()
-        info = ""
-        info += f"netdata version = {r_json['version']}\n"
-        info += f"hostname = {r_json['mirrored_hosts'][0]}\n"
-        info += f"operating system = {r_json['os_name']}\n"
-        info += f"operating system version = {r_json['os_id']}\n"
-        info += f"cores total = {r_json['cores_total']}\n"
-        info += f"total disk space = {r_json['total_disk_space']}\n"
-        info += f"ram total = {r_json['ram_total']}\n"
+
+        info = (
+            f"netdata version = {r_json['version']}\n"
+            f"hostname = {r_json['mirrored_hosts'][0]}\n"
+            f"operating system = {r_json['os_name']}\n"
+            f"operating system version = {r_json['os_id']}\n"
+            f"cores total = {r_json['cores_total']}\n"
+            f"total disk space = {r_json['total_disk_space']}\n"
+            f"ram total = {r_json['ram_total']}\n"
+        )
+
         return info
-    except Exception as e:
-        return f"Error retrieving Netdata info: {e}"
 
-
-def get_netdata_charts(params: GetNetdataChartsInput = GetNetdataChartsInput()) -> str:
-    """
-    Calls Netdata /api/v1/charts to retrieve the list of available charts.
-    No input params are needed, so we accept an empty Pydantic model.
-    """
-    url = f"{NETDATA_BASE_URL}/api/v1/charts"
-    try:
+    def _get_netdata_charts(self, params: GetNetdataChartsInput) -> str:
+        """
+        Calls Netdata /api/v1/charts to retrieve the list of available charts.
+        No input params are needed, so we accept an empty Pydantic model.
+        """
+        url = f"{self.base_url}/api/v1/charts"
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
         r_json = resp.json()
+
         charts = {}
         for chart in r_json["charts"]:
             charts[chart] = {
                 "name": r_json["charts"][chart]["name"],
                 "title": r_json["charts"][chart]["title"],
             }
+
         return json.dumps(charts, indent=2)
-    except Exception as e:
-        return f"Error retrieving charts: {e}"
 
-
-def get_netdata_chart_info(
-    params: GetNetdataChartInfoInput = GetNetdataChartInfoInput(),
-) -> str:
-    """
-    Calls Netdata /api/v1/charts/ to retrieve info for a specific chart.
-    The Pydantic model (GetNetdataChartInfoInput) provides:
-      - params.chart (required)
-    """
-    try:
-        url = f"{NETDATA_BASE_URL}/api/v1/charts"
+    def _get_netdata_chart_info(self, params: GetNetdataChartInfoInput) -> str:
+        """
+        Calls Netdata /api/v1/charts to retrieve info for a specific chart.
+        The Pydantic model (GetNetdataChartInfoInput) provides:
+          - params.chart (required)
+        """
+        url = f"{self.base_url}/api/v1/charts"
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
-        chart_info = resp.json()["charts"][params.chart]
+        chart_data = resp.json()["charts"][params.chart]
+
         chart_info = {
-            "id": chart_info["id"],
-            "title": chart_info["title"],
-            "units": chart_info["units"],
-            "family": chart_info["family"],
-            "context": chart_info["context"],
-            "dimensions": list(chart_info["dimensions"].keys()),
+            "id": chart_data["id"],
+            "title": chart_data["title"],
+            "units": chart_data["units"],
+            "family": chart_data["family"],
+            "context": chart_data["context"],
+            "dimensions": list(chart_data["dimensions"].keys()),
         }
+
         return json.dumps(chart_info, indent=2)
-    except Exception as e:
-        return f"Error retrieving chart info: {e}"
 
+    def _get_netdata_chart_data(self, params: GetNetdataChartDataInput) -> str:
+        """
+        Calls Netdata /api/v1/data for a specific chart.
 
-def get_netdata_chart_data(
-    params: GetNetdataChartDataInput = GetNetdataChartDataInput(),
-) -> str:
-    """
-    Calls Netdata /api/v1/data for a specific chart.
-
-    The Pydantic model (GetNetdataChartDataInput) provides:
-      - params.chart (required)
-      - params.after (default: '-60')
-      - params.before (default: 'now')
-      - params.points (default: 60)
-    """
-    try:
-        url = f"{NETDATA_BASE_URL}/api/v1/data"
+        The Pydantic model (GetNetdataChartDataInput) provides:
+          - params.chart (required)
+          - params.after (default: '-60')
+          - params.before (default: 'now')
+          - params.points (default: 60)
+        """
+        url = f"{self.base_url}/api/v1/data"
         query_params = {
             "chart": params.chart,
             "after": params.after,
@@ -134,73 +199,12 @@ def get_netdata_chart_data(
 
         resp = requests.get(url, params=query_params, timeout=5)
         resp.raise_for_status()
+
         return json.dumps(resp.json(), indent=2)
-    except Exception as e:
-        return f"Error retrieving chart data: {e}"
 
+    def run(self, query: str) -> str:
+        """
+        A convenience method to send queries to the AgentExecutor.
+        """
+        return self.agent_executor.run(query)
 
-get_netdata_info_tool = StructuredTool.from_function(
-    name="get_netdata_info",
-    func=get_netdata_info,
-    description="Gets high-level system info from Netdata. No parameters required.",
-    args_schema=GetNetdataInfoInput,
-)
-
-get_netdata_charts_tool = StructuredTool.from_function(
-    name="get_netdata_charts",
-    func=get_netdata_charts,
-    description="Gets a list of available charts from Netdata. No parameters required.",
-    args_schema=GetNetdataChartsInput,
-)
-
-get_netdata_chart_info_tool = StructuredTool.from_function(
-    name="get_netdata_chart_info",
-    func=get_netdata_chart_info,
-    description=(
-        "Gets detailed info e.g. dimensions it has etc, for a specific chart from Netdata. "
-        "Provide a chart name (e.g. 'cpu.cpu0')."
-    ),
-    args_schema=GetNetdataChartInfoInput,
-)
-
-get_netdata_chart_data_tool = StructuredTool.from_function(
-    name="get_netdata_chart_data",
-    func=get_netdata_chart_data,
-    description=(
-        "Gets data for a specific chart from Netdata. "
-        "Provide a chart name (e.g. 'cpu.cpu0'), 'after' and 'before' timestamps."
-    ),
-    args_schema=GetNetdataChartDataInput,
-)
-
-
-def create_netdata_agent(NETDATA_BASE_URL: str = NETDATA_BASE_URL):
-    """
-    Creates a LangChain agent with some Netdata tools:
-      - get_netdata_info_tool
-      - get_netdata_charts_tool
-      - get_netdata_chart_info_tool
-      - get_netdata_chart_data_tool
-    The agent uses a ChatOpenAI model.
-    """
-    model = ChatOpenAI(model="gpt-4o")
-    tools = [
-        get_netdata_info_tool,
-        get_netdata_charts_tool,
-        get_netdata_chart_info_tool,
-        get_netdata_chart_data_tool,
-    ]
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                "You are a helpful assistant tasked with helping the user better understand their Netdata system.",
-            ),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ]
-    )
-    agent = create_tool_calling_agent(model, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools)
-
-    return agent_executor
