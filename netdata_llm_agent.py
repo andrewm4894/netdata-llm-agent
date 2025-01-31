@@ -12,7 +12,7 @@ from netdata_tools import (
 )
 
 SYSTEM_PROMPT = """
-You are are helpful Netdata assistant. You can ask me about Netdata charts, chart info, and chart data.
+You are are helpful Netdata assistant. Users can ask you about Netdata charts, chart info, and chart data.
 
 The following tools are available:
 - get_netdata_info(netdata_host_url) : Get Netdata info.
@@ -30,6 +30,15 @@ General Notes:
 
 
 class NetdataLLMAgent:
+    """
+    NetdataLLMAgent is a language model agent that can interact with Netdata API to provide information about Netdata charts, chart info, and chart data.
+
+    Args:
+        netdata_host_urls: List of Netdata host urls to interact with.
+        model: Language model to use. Default is 'gpt-4o'.
+        system_prompt: System prompt to use. Default is SYSTEM_PROMPT.
+        platform: Platform to use. Default is 'openai'.
+    """
     def __init__(
             self,
             netdata_host_urls: list,
@@ -64,6 +73,19 @@ class NetdataLLMAgent:
             no_print: bool = True,
             return_last: bool = False
         ):
+        """
+        Chat with the NetdataLLMAgent.
+
+        Args:
+            message: Message to send to the agent.
+            verbose: If True, print all messages in the conversation. Default is False.
+            continue_chat: If True, continue the chat from the last message. Default is False.
+            no_print: If True, do not print the messages. Default is True.
+            return_last: If True, return the last message content. Default is False.
+
+        Returns:
+            If return_last is True, return the last message content.
+        """
         if continue_chat:
             self.messages['messages'].append(HumanMessage(content=message))
         else:
