@@ -5,95 +5,48 @@ import pandas as pd
 
 def get_netdata_info(base_url: str) -> str:
     """
-    Calls Netdata /api/v1/info to retrieve system info.
+    Calls Netdata /api/v1/info to retrieve system info and some metadata.
 
     Args:
-        base_url: Netdata base url.
+        base_url: Netdata base url to call.
 
     Returns:
-        System info.
+        JSON string with system info.
     """
     url = f"{base_url}/api/v1/info"
     resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
     r_json = resp.json()
 
-    info = (
-        f"netdata version = {r_json['version']}\n"
-        f"hostname = {r_json['mirrored_hosts'][0]}\n"
-        f"operating system = {r_json['os_name']}\n"
-        f"operating system version = {r_json['os_id']}\n"
-        f"cores total = {r_json['cores_total']}\n"
-        f"total disk space = {r_json['total_disk_space']}\n"
-        f"ram total = {r_json['ram_total']}\n"
-    )
+    info = {
+        "netdata_version": r_json['version'],
+        "hostname": r_json['mirrored_hosts'][0],
+        "operating_system": r_json['os_name'],
+        "operating_system_version": r_json['os_id'],
+        "cores_total": r_json['cores_total'],
+        "total_disk_space": r_json['total_disk_space'],
+        "ram_total": r_json['ram_total'],
+        "mirrored_hosts_status": r_json['mirrored_hosts_status'],
+        "alarms": r_json['alarms'],
+        "buildinfo": r_json['buildinfo'],
+        "charts-count": r_json['charts-count'],
+        "metrics-count": r_json['metrics-count'],
+    }
 
-    return info
-
-
-def get_netdata_info(base_url: str) -> str:
-    """
-    Calls Netdata /api/v1/info to retrieve system info.
-
-    Args:
-        base_url: Netdata base url.
-
-    Returns:
-        System info.
-    """
-    url = f"{base_url}/api/v1/info"
-    resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
-    r_json = resp.json()
-
-    info = (
-        f"netdata version = {r_json['version']}\n"
-        f"hostname = {r_json['mirrored_hosts'][0]}\n"
-        f"operating system = {r_json['os_name']}\n"
-        f"operating system version = {r_json['os_id']}\n"
-        f"cores total = {r_json['cores_total']}\n"
-        f"total disk space = {r_json['total_disk_space']}\n"
-        f"ram total = {r_json['ram_total']}\n"
-    )
-
-    return info
-
-
-def get_netdata_info(base_url: str) -> str:
-    """
-    Calls Netdata /api/v1/info to retrieve system info.
-
-    Args:
-        base_url: Netdata base url.
-
-    Returns:
-        System info.
-    """
-    url = f"{base_url}/api/v1/info"
-    resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
-    r_json = resp.json()
-
-    info = (
-        f"netdata version = {r_json['version']}\n"
-        f"hostname = {r_json['mirrored_hosts'][0]}\n"
-        f"operating system = {r_json['os_name']}\n"
-        f"operating system version = {r_json['os_id']}\n"
-        f"cores total = {r_json['cores_total']}\n"
-        f"total disk space = {r_json['total_disk_space']}\n"
-        f"ram total = {r_json['ram_total']}\n"
-    )
-
-    return info
+    return json.dumps(info, indent=2)
 
 
 def get_netdata_charts(base_url: str) -> str:
     """
-    Calls Netdata /api/v1/charts to retrieve the list of available charts.
+    Calls Netdata /api/v1/charts to retrieve the list of available charts and some metadata about each chart.
+
+    Args:
+        base_url: Netdata base url to call.
+
+    Returns:
+        JSON string with chart metadata.
     """
     url = f"{base_url}/api/v1/charts"
     resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
     r_json = resp.json()
 
     charts = {}
@@ -108,7 +61,7 @@ def get_netdata_charts(base_url: str) -> str:
 
 def get_netdata_chart_info(base_url: str, chart: str = 'system.cpu') -> str:
     """
-    Calls Netdata /api/v1/charts to retrieve info for a specific chart.
+    Calls Netdata /api/v1/chart?chart={chart} to retrieve info for a specific chart.
 
     Args:
         base_url: Netdata base url.
@@ -117,11 +70,9 @@ def get_netdata_chart_info(base_url: str, chart: str = 'system.cpu') -> str:
     Returns:
         Chart info.
     """
-    url = f"{base_url}/api/v1/charts"
+    url = f"{base_url}/api/v1/chart?chart={chart}"
     resp = requests.get(url, timeout=5)
-    resp.raise_for_status()
-    chart_data = resp.json()["charts"][chart]
-
+    chart_data = resp.json()
     chart_info = {
         "id": chart_data["id"],
         "title": chart_data["title"],
@@ -129,14 +80,32 @@ def get_netdata_chart_info(base_url: str, chart: str = 'system.cpu') -> str:
         "family": chart_data["family"],
         "context": chart_data["context"],
         "dimensions": list(chart_data["dimensions"].keys()),
+        "data_url": chart_data["data_url"],
+        "alarms": chart_data["alarms"],
     }
 
     return json.dumps(chart_info, indent=2)
 
 
-def get_netdata_chart_data(base_url: str, chart: str = 'system.cpu', after: int = -60, before: int = 0, points: int = 60) -> str:
+def get_netdata_chart_data(
+        base_url: str,
+        chart: str = 'system.cpu',
+        after: int = -60,
+        before: int = 0,
+        points: int = 60
+    ) -> str:
     """
     Calls Netdata /api/v1/data?chart=chart for a specific chart.
+
+    Args:
+        base_url: Netdata base url.
+        chart: Chart id.
+        after: Seconds before now or timestamp in seconds.
+        before: Seconds after now or timestamp in seconds.
+        points: Number of points to retrieve. Can be used to aggregate data.
+
+    Returns:
+        JSON string with chart data.
     """
     url = f"{base_url}/api/v1/data"
     query_params = {
@@ -146,9 +115,7 @@ def get_netdata_chart_data(base_url: str, chart: str = 'system.cpu', after: int 
         "format": "json",
         "points": points,
     }
-
     resp = requests.get(url, params=query_params, timeout=5)
-    resp.raise_for_status()
     resp_json = resp.json()
     df = pd.DataFrame(resp_json["data"], columns=resp_json["labels"])
 
