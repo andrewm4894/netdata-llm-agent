@@ -11,7 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 
-BASE_URL = "http://127.0.0.1:19999"
+NETDATA_BASE_URL = "https://london3.my-netdata.io"
 
 
 class GetNetdataInfoInput(BaseModel):
@@ -45,7 +45,7 @@ def get_netdata_info(params: GetNetdataInfoInput = GetNetdataInfoInput()) -> str
     Calls Netdata /api/v1/info to retrieve system info.
     No input params are needed, so we accept an empty Pydantic model.
     """
-    url = f"{BASE_URL}/api/v1/info"
+    url = f"{NETDATA_BASE_URL}/api/v1/info"
     try:
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
@@ -68,7 +68,7 @@ def get_netdata_charts(params: GetNetdataChartsInput = GetNetdataChartsInput()) 
     Calls Netdata /api/v1/charts to retrieve the list of available charts.
     No input params are needed, so we accept an empty Pydantic model.
     """
-    url = f"{BASE_URL}/api/v1/charts"
+    url = f"{NETDATA_BASE_URL}/api/v1/charts"
     try:
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
@@ -93,7 +93,7 @@ def get_netdata_chart_info(
       - params.chart (required)
     """
     try:
-        url = f"{BASE_URL}/api/v1/charts"
+        url = f"{NETDATA_BASE_URL}/api/v1/charts"
         resp = requests.get(url, timeout=5)
         resp.raise_for_status()
         chart_info = resp.json()["charts"][params.chart]
@@ -123,7 +123,7 @@ def get_netdata_chart_data(
       - params.points (default: 60)
     """
     try:
-        url = f"{BASE_URL}/api/v1/data"
+        url = f"{NETDATA_BASE_URL}/api/v1/data"
         query_params = {
             "chart": params.chart,
             "after": params.after,
@@ -174,7 +174,7 @@ get_netdata_chart_data_tool = StructuredTool.from_function(
 )
 
 
-def create_netdata_agent(base_url: str = BASE_URL):
+def create_netdata_agent(NETDATA_BASE_URL: str = NETDATA_BASE_URL):
     """
     Creates a LangChain agent with some Netdata tools:
       - get_netdata_info_tool
