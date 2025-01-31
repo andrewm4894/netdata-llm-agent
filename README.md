@@ -2,6 +2,8 @@
 
 An LLM agent for chatting with your netdata server's.
 
+See [example notebook](./example.ipynb) for more updated examples.
+
 Example:
 
 ```python
