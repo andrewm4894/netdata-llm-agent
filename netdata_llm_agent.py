@@ -18,7 +18,7 @@ The following tools are available:
 - get_netdata_info(netdata_host_url) : Get Netdata info.
 - get_netdata_charts(netdata_host_url) : Get Netdata charts.
 - get_netdata_chart_info(netdata_host_url, chart) : Get Netdata chart info for a specific chart.
-- get_netdata_chart_data(netdata_host_url, chart) : Get Netdata chart data for a specific chart.
+- get_netdata_chart_data(netdata_host_url, chart, after, before, points) : Get Netdata chart data for a specific chart.
 - get_netdata_alarms(netdata_host_url) : Get Netdata alarms.
 
 General Notes:
