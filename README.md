@@ -1,3 +1,3 @@
-# netdata-agent
+# Netdata LLM Agent
 
-LLM agent for your netdata server.
+An LLM agent for chatting with your netdata server's.

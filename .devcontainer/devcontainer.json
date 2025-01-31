@@ -1,0 +1,21 @@
+{
+    "name": "Netdata LLM Agent",
+    "build": {
+      "dockerfile": "Dockerfile",
+      "context": ".."
+    },
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "python.pythonPath": "/usr/local/bin/python"
+        },
+        "extensions": [
+            "ms-python.python",
+            "ms-azuretools.vscode-docker",
+            "github.copilot",
+            "GitHub.copilot-chat"
+            ]
+      }
+    },
+    "postCreateCommand": "pip install -r ../requirements.txt"
+  }
