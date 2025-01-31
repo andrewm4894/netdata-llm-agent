@@ -28,11 +28,11 @@ class NetdataLLMAgent:
         ]
 
         self.agent = create_react_agent(
-            self.llm, 
+            self.llm,
             tools=self.tools,
             prompt=SystemMessage(content=self.system_prompt)
             )
-    
+
     def chat(self, message: str, verbose: bool = True):
         self.messages = [HumanMessage(content=message)]
         self.messages = self.agent.invoke({"messages": self.messages})
