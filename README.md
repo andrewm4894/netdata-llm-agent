@@ -3,7 +3,20 @@
 An LLM agent for chatting with your netdata server's.
 
 Example: 
+
+```python
+from netdata_llm_agent import NetdataLLMAgent
+
+# create agent
+agent = NetdataLLMAgent(base_url='https://london3.my-netdata.io/', model='gpt-4o')
+
+# chat with agent
+agent.chat('How much disk space do i have?')
 ```
+
+Response: 
+
+```text
 ================================[1m Human Message [0m=================================
 
 How much disk space do i have?
