@@ -10,7 +10,7 @@ Example:
 from netdata_llm_agent import NetdataLLMAgent
 
 # create agent
-agent = NetdataLLMAgent(base_url='https://london3.my-netdata.io/', model='gpt-4o')
+agent = NetdataLLMAgent(base_url='https://london3.my-netdata.io/')
 
 # chat with agent
 agent.chat('How much disk space do i have?')
