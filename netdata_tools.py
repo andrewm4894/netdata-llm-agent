@@ -3,17 +3,17 @@ import requests
 import pandas as pd
 
 
-def get_netdata_info(base_url: str) -> str:
+def get_netdata_info(netdata_host_url: str) -> str:
     """
     Calls Netdata /api/v1/info to retrieve system info and some metadata.
 
     Args:
-        base_url: Netdata base url to call.
+        netdata_host_url: Netdata host url to call.
 
     Returns:
         JSON string with system info.
     """
-    url = f"{base_url}/api/v1/info"
+    url = f"{netdata_host_url}/api/v1/info"
     resp = requests.get(url, timeout=5)
     r_json = resp.json()
 
@@ -35,17 +35,17 @@ def get_netdata_info(base_url: str) -> str:
     return json.dumps(info, indent=2)
 
 
-def get_netdata_charts(base_url: str) -> str:
+def get_netdata_charts(netdata_host_url: str) -> str:
     """
     Calls Netdata /api/v1/charts to retrieve the list of available charts and some metadata about each chart.
 
     Args:
-        base_url: Netdata base url to call.
+        netdata_host_url: Netdata host url to call.
 
     Returns:
         JSON string with chart metadata.
     """
-    url = f"{base_url}/api/v1/charts"
+    url = f"{netdata_host_url}/api/v1/charts"
     resp = requests.get(url, timeout=5)
     r_json = resp.json()
 
@@ -59,18 +59,18 @@ def get_netdata_charts(base_url: str) -> str:
     return json.dumps(charts, indent=2)
 
 
-def get_netdata_chart_info(base_url: str, chart: str = 'system.cpu') -> str:
+def get_netdata_chart_info(netdata_host_url: str, chart: str = 'system.cpu') -> str:
     """
     Calls Netdata /api/v1/chart?chart={chart} to retrieve info for a specific chart.
 
     Args:
-        base_url: Netdata base url.
+        netdata_host_url: Netdata host url.
         chart: Chart id.
 
     Returns:
         Chart info.
     """
-    url = f"{base_url}/api/v1/chart?chart={chart}"
+    url = f"{netdata_host_url}/api/v1/chart?chart={chart}"
     resp = requests.get(url, timeout=5)
     chart_data = resp.json()
     chart_info = {
@@ -88,7 +88,7 @@ def get_netdata_chart_info(base_url: str, chart: str = 'system.cpu') -> str:
 
 
 def get_netdata_chart_data(
-        base_url: str,
+        netdata_host_url: str,
         chart: str = 'system.cpu',
         after: int = -60,
         before: int = 0,
@@ -98,7 +98,7 @@ def get_netdata_chart_data(
     Calls Netdata /api/v1/data?chart=chart for a specific chart.
 
     Args:
-        base_url: Netdata base url.
+        netdata_host_url: Netdata host url.
         chart: Chart id.
         after: Seconds before now or timestamp in seconds.
         before: Seconds after now or timestamp in seconds.
@@ -107,7 +107,7 @@ def get_netdata_chart_data(
     Returns:
         JSON string with chart data.
     """
-    url = f"{base_url}/api/v1/data"
+    url = f"{netdata_host_url}/api/v1/data"
     query_params = {
         "chart": chart,
         "after": after,
@@ -120,3 +120,29 @@ def get_netdata_chart_data(
     df = pd.DataFrame(resp_json["data"], columns=resp_json["labels"])
 
     return df.to_string(index=False)
+
+
+def get_netdata_alarms(netdata_host_url: str) -> str:
+    """
+    Calls Netdata /api/v1/alarms to retrieve the list of active alarms.
+
+    Args:
+        netdata_host_url: Netdata host url.
+
+    Returns:
+        JSON string with active alarms.
+    """
+    url = f"{netdata_host_url}/api/v1/alarms"
+    resp = requests.get(url, timeout=5)
+    r_json = resp.json()
+
+    alarms = {}
+    for alarm in r_json["alarms"]:
+        alarms[alarm] = {
+            "name": r_json["alarms"][alarm]["name"],
+            "status": r_json["alarms"][alarm]["status"],
+            "value": r_json["alarms"][alarm]["value"],
+            "info": r_json["alarms"][alarm]["info"],
+        }
+
+    return json.dumps(alarms, indent=2)
