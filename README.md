@@ -4,6 +4,19 @@ An LLM agent for chatting with your netdata server's.
 
 See [example notebook](./example.ipynb) for more updated examples.
 
+## TODO
+
+Some things i'd like to do:
+
+- [ ] make pip installable.
+- [ ] make cli tool for chating with agent.
+- [ ] dockerize it all.
+- [ ] add anthropic support.
+- [ ] optimize and expand custom netdata tool usage and structure etc.
+- [ ] add more examples.
+- [ ] add ability to use local models using ollama.
+- [ ] add deeper context and knowledge of netdata and its tools.
+
 ## App Example
 
 A little streamlit app that uses the agent to chat with your netdata server's.
