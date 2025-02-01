@@ -1,3 +1,5 @@
+# ./netdata_llm_tools.py
+
 import json
 import requests
 import pandas as pd
@@ -175,12 +177,13 @@ def get_alarms(netdata_host_url: str, all: bool = False, active: bool = False) -
     return json.dumps(alarms, indent=2)
 
 
-def get_current_metrics(netdata_host_url: str) -> str:
+def get_current_metrics(netdata_host_url: str, search_term: str = None) -> str:
     """
-    Calls Netdata /api/v1/allmetrics to retrieve current values for all metrics.
+    Calls Netdata /api/v1/allmetrics to retrieve current values for all metrics. Optionally filter by search_term on he chart name.
 
     Args:
         netdata_host_url: Netdata host url.
+        search_term: Optional search term to filter the metrics by chart name.
 
     Returns:
         JSON string with all metrics and their current values.
@@ -196,6 +199,7 @@ def get_current_metrics(netdata_host_url: str) -> str:
             },
         }
         for c in r_json
+        if not search_term or search_term in c
     }
 
     return json.dumps(all_metrics, indent=2)

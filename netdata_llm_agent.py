@@ -1,9 +1,11 @@
+# ./netdata_llm_agent.py
+
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 
-from netdata_tools import (
+from netdata_llm_tools import (
     get_info,
     get_charts,
     get_chart_info,
@@ -21,7 +23,7 @@ The following tools are available:
 - get_chart_info(netdata_host_url, chart) : Get Netdata chart info for a specific chart.
 - get_chart_data(netdata_host_url, chart, after, before, points, df_freq) : Get Netdata chart data for a specific chart.
 - get_alarms(netdata_host_url, all, active) : Get Netdata alarms. all=True to get all alarms, active=True to get active alarms (warning or critical).
-- get_current_metrics(netdata_host_url) : Get current metrics values for all charts, no time range, just the current values for all dimensions on all charts.
+- get_current_metrics(netdata_host_url, search_term) : Get current metrics values for all charts, no time range, just the current values for all dimensions on all charts. Optionally filter by search_term on chart name.
 
 General Notes:
 - Every netdata node is different and may have different charts available so it's usually best to check the available charts with get_charts() first.
