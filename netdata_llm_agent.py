@@ -17,17 +17,20 @@ You are are helpful Netdata assistant. Users can ask you about Netdata charts, c
 
 The following tools are available:
 - get_info(netdata_host_url) : Get Netdata info.
-- get_charts(netdata_host_url) : Get Netdata charts.
+- get_charts(netdata_host_url, search_term) : Get Netdata charts, optionally filter by search_term.
 - get_chart_info(netdata_host_url, chart) : Get Netdata chart info for a specific chart.
-- get_chart_data(netdata_host_url, chart, after, before, points) : Get Netdata chart data for a specific chart.
-- get_alarms(netdata_host_url) : Get Netdata alarms.
-- get_current_metrics(netdata_host_url) : Get current metrics values for all charts, no time range, just the current values.
+- get_chart_data(netdata_host_url, chart, after, before, points, df_freq) : Get Netdata chart data for a specific chart.
+- get_alarms(netdata_host_url, all, active) : Get Netdata alarms. all=True to get all alarms, active=True to get active alarms (warning or critical).
+- get_current_metrics(netdata_host_url) : Get current metrics values for all charts, no time range, just the current values for all dimensions on all charts.
 
 General Notes:
-- When pulling data from get_chart_data() you can leverage the points param to aggregate data points given the specific after and before time range.
+- Every netdata node is different and may have different charts available so it's usually best to check the available charts with get_charts() first.
+- When pulling data from get_chart_data() you can leverage the points and df_freq param's to aggregate data points given the specific after and before time range.
 - When there are multiple mirrored hosts you can adapt the base url to reflect the specific host you want to pull data from if the user asks about one of the mirrored hosts.
 - Charts with breakouts per user typically live at user.* eg. user.cpu_utilization, user.mem_usage etc. as per get_charts().
 - Charts with breakouts per application typically live at app.* eg. app.cpu_utilization, app.mem_usage etc. as per get_charts().
+- Use get_charts() with the search_term param to filter charts by a specific term if unsure of the chart name.
+- Once you have the chart name you can use get_chart_info() to get more detailed information about the chart and get_chart_data() to get the data for the chart.
 """
 
 
@@ -41,18 +44,23 @@ class NetdataLLMAgent:
         system_prompt: System prompt to use. Default is SYSTEM_PROMPT.
         platform: Platform to use. Default is 'openai'.
     """
+
     def __init__(
-            self,
-            netdata_host_urls: list,
-            model: str = "gpt-4o",
-            system_prompt: str = SYSTEM_PROMPT,
-            platform: str = "openai",
-        ):
+        self,
+        netdata_host_urls: list,
+        model: str = "gpt-4o",
+        system_prompt: str = SYSTEM_PROMPT,
+        platform: str = "openai",
+    ):
         self.netdata_host_urls = netdata_host_urls
-        self.system_prompt = f'{system_prompt}\n\nSpecific Notes: \n- The netdata_host_urls available are {netdata_host_urls}'
+        self.system_prompt = self._create_system_prompt(system_prompt, netdata_host_urls)
         self.messages = {"messages": []}
         self.platform = platform
-        self.llm = ChatOpenAI(model=model) if platform == "openai" else ValueError("Only openai platform is supported.")
+        self.llm = (
+            ChatOpenAI(model=model)
+            if platform == "openai"
+            else ValueError("Only openai platform is supported.")
+        )
         self.tools = [
             tool(get_info, parse_docstring=True),
             tool(get_charts, parse_docstring=True),
@@ -63,20 +71,33 @@ class NetdataLLMAgent:
         ]
 
         self.agent = create_react_agent(
-            self.llm,
-            tools=self.tools,
-            prompt=SystemMessage(content=self.system_prompt)
-            )
+            self.llm, tools=self.tools, prompt=SystemMessage(content=self.system_prompt)
+        )
+
+    def _create_system_prompt(self, base_prompt: str, netdata_host_urls: list) -> str:
+        """
+        Create the system prompt by appending specific notes about the Netdata host URLs.
+
+        Args:
+            base_prompt: The base system prompt.
+            netdata_host_urls: List of Netdata host URLs.
+
+        Returns:
+            The complete system prompt.
+        """
+        specific_notes = "Specific Notes: \n"
+        specific_notes += f"- The netdata_host_urls available are {netdata_host_urls}"
+        return f"{base_prompt}\n{specific_notes}"
 
     def chat(
-            self,
-            message: str,
-            verbose: bool = False,
-            continue_chat: bool = False,
-            no_print: bool = True,
-            return_last: bool = False,
-            return_thinking: bool = False
-        ):
+        self,
+        message: str,
+        verbose: bool = False,
+        continue_chat: bool = False,
+        no_print: bool = True,
+        return_last: bool = False,
+        return_thinking: bool = False,
+    ):
         """
         Chat with the NetdataLLMAgent.
 
@@ -93,13 +114,15 @@ class NetdataLLMAgent:
             If return_thinking is True, return the new messages.
         """
         if continue_chat:
-            self.messages['messages'].append(HumanMessage(content=message))
+            self.messages["messages"].append(HumanMessage(content=message))
         else:
             self.messages = {"messages": [HumanMessage(content=message)]}
         messages_updated = self.agent.invoke(self.messages)
         len_messages_updated = len(messages_updated["messages"])
         len_self_messages = len(self.messages["messages"])
-        new_messages = messages_updated["messages"][-(len_messages_updated - len_self_messages):]
+        new_messages = messages_updated["messages"][
+            -(len_messages_updated - len_self_messages) :
+        ]
         self.messages = messages_updated
         if not no_print:
             if verbose:

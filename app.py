@@ -85,8 +85,16 @@ def chat_input():
 
 def main():
     """Main function to run the Streamlit app."""
+    st.set_page_config(
+        page_title="Netdata LLM Agent Chat",
+        page_icon="./static/i-love-trouble.jpg",
+        layout="wide",
+    )
     st.logo("./static/i-love-trouble.jpg", link="https://www.netdata.cloud/")
-    st.title("Netdata LLM Agent Chat")
+    st.markdown(
+        "<h1 style='color: #00AB44;'>Netdata LLM Agent Chat</h1>",
+        unsafe_allow_html=True,
+    )
 
     init_session_state()
     sidebar_config()

@@ -39,12 +39,13 @@ def get_info(netdata_host_url: str) -> str:
     return json.dumps(info, indent=2)
 
 
-def get_charts(netdata_host_url: str) -> str:
+def get_charts(netdata_host_url: str, search_term: str = None) -> str:
     """
-    Calls Netdata /api/v1/charts to retrieve the list of available charts and some metadata about each chart.
+    Calls Netdata /api/v1/charts to retrieve the list of available charts and some metadata about each chart. Use the search_term to filter the charts if needed.
 
     Args:
         netdata_host_url: Netdata host url to call.
+        search_term: Optional search term to filter the charts returned.
 
     Returns:
         JSON string with chart metadata. List of tuples with chart id and title.
@@ -55,6 +56,8 @@ def get_charts(netdata_host_url: str) -> str:
 
     charts = []
     for chart in r_json["charts"]:
+        if search_term and search_term not in r_json["charts"][chart]["name"]:
+            continue
         charts.append(
             (r_json["charts"][chart]["name"], r_json["charts"][chart]["title"])
         )
@@ -130,27 +133,43 @@ def get_chart_data(
     return df.to_string(index=False)
 
 
-def get_alarms(netdata_host_url: str) -> str:
+def get_alarms(netdata_host_url: str, all: bool = False, active: bool = False) -> str:
     """
-    Calls Netdata /api/v1/alarms to retrieve the list of active alarms.
+    Calls Netdata /api/v1/alarms to retrieve information about alarms.
 
     Args:
         netdata_host_url: Netdata host url.
+        all: Get all enabled alarms regardless of status.
+        active: Get only raised alarms in WARNING or CRITICAL status.
 
     Returns:
-        JSON string with active alarms.
+        JSON string with alarm information.
     """
-    url = f"{netdata_host_url}/api/v1/alarms"
+    url = f"{netdata_host_url}/api/v1/alarms?{'all' if all else ''}&{'active' if active else ''}"
     resp = requests.get(url, timeout=5)
     r_json = resp.json()
 
     alarms = {}
     for alarm in r_json["alarms"]:
         alarms[alarm] = {
-            "name": r_json["alarms"][alarm]["name"],
-            "status": r_json["alarms"][alarm]["status"],
-            "value": r_json["alarms"][alarm]["value"],
-            "info": r_json["alarms"][alarm]["info"],
+            "name": r_json["alarms"][alarm].get("name", ""),
+            "status": r_json["alarms"][alarm].get("status", ""),
+            "value": r_json["alarms"][alarm].get("value", ""),
+            "units": r_json["alarms"][alarm].get("units", ""),
+            "info": r_json["alarms"][alarm].get("info", ""),
+            "summary": r_json["alarms"][alarm].get("summary", ""),
+            "chart": r_json["alarms"][alarm].get("chart", ""),
+            "class": r_json["alarms"][alarm].get("class", ""),
+            "component": r_json["alarms"][alarm].get("component", ""),
+            "workload": r_json["alarms"][alarm].get("workload", ""),
+            "type": r_json["alarms"][alarm].get("type", ""),
+            "active": r_json["alarms"][alarm].get("active", ""),
+            "silenced": r_json["alarms"][alarm].get("silenced", ""),
+            "disabled": r_json["alarms"][alarm].get("disabled", ""),
+            "lookup_dimensions": r_json["alarms"][alarm].get("lookup_dimensions", ""),
+            "calc": r_json["alarms"][alarm].get("calc", ""),
+            "warn": r_json["alarms"][alarm].get("warn", ""),
+            "crit": r_json["alarms"][alarm].get("crit", ""),
         }
 
     return json.dumps(alarms, indent=2)
