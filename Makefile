@@ -1,6 +1,7 @@
 .PHONY: requirements
 .PHONY: requirements-install
 .PHONY: pre-commit
+.PHONY: run-app
 
 requirements:
 	@pip-compile requirements.compile -o requirements.txt
@@ -14,3 +15,6 @@ pre-commit:
 	@pre-commit install --hook-type pre-push
 	@pre-commit run --all-files
 	@pre-commit autoupdate
+
+run-app:
+	@streamlit run app.py
