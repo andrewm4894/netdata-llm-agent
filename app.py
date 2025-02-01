@@ -11,58 +11,56 @@ DEFAULT_NETDATA_URLS = [
     "https://toronto.my-netdata.io/",
 ]
 
-st.logo("./static/i-love-trouble.jpg", link="https://www.netdata.cloud/")
-st.title("Netdata LLM Agent Chat")
 
-# --- Session State Setup ---
-if "netdata_urls" not in st.session_state:
-    st.session_state.netdata_urls = DEFAULT_NETDATA_URLS
+def init_session_state():
+    """Initialize session state variables if not already set."""
+    if "netdata_urls" not in st.session_state:
+        st.session_state.netdata_urls = DEFAULT_NETDATA_URLS
+    if "agent" not in st.session_state:
+        st.session_state.agent = NetdataLLMAgent(st.session_state.netdata_urls)
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = []
+    if "reverse_chat" not in st.session_state:
+        st.session_state.reverse_chat = False
+    if "verbose_mode" not in st.session_state:
+        st.session_state.verbose_mode = False
 
-if "agent" not in st.session_state:
-    st.session_state.agent = NetdataLLMAgent(st.session_state.netdata_urls)
 
-if "conversation" not in st.session_state:
-    st.session_state.conversation = []
+def sidebar_config():
+    """Render and handle sidebar configuration."""
+    st.sidebar.header("Configuration")
 
-if "reverse_chat" not in st.session_state:
-    st.session_state.reverse_chat = False
+    netdata_url_input = st.sidebar.text_area(
+        "Enter Netdata URLs (one per line):",
+        value="\n".join(st.session_state.netdata_urls),
+        height=150,
+    )
 
-if "verbose_mode" not in st.session_state:
-    st.session_state.verbose_mode = False
+    if st.sidebar.button("Update Netdata URLs"):
+        new_urls = [
+            url.strip() for url in netdata_url_input.splitlines() if url.strip()
+        ]
+        st.session_state.netdata_urls = new_urls
+        st.session_state.agent = NetdataLLMAgent(new_urls)
+        st.session_state.conversation = []
+        st.rerun()
 
-# --- Sidebar Configuration ---
-st.sidebar.header("Configuration")
+    st.sidebar.checkbox(
+        "Reverse Chat Order",
+        key="reverse_chat",
+        help="Reverse the order of the chat messages.",
+    )
 
-netdata_url_input = st.sidebar.text_area(
-    "Enter Netdata URLs (one per line):",
-    value="\n".join(st.session_state.netdata_urls),
-    height=150,
-)
+    st.sidebar.checkbox(
+        "Verbose Mode", key="verbose_mode", help="Toggle verbose output for debugging."
+    )
 
-if st.sidebar.button("Update Netdata URLs"):
-    new_urls = [url.strip() for url in netdata_url_input.splitlines() if url.strip()]
-    st.session_state.netdata_urls = new_urls
-    st.session_state.agent = NetdataLLMAgent(new_urls)
-    st.session_state.conversation = []
-    st.rerun()
+    if st.sidebar.button("Clear Chat"):
+        st.session_state.agent = NetdataLLMAgent(st.session_state.netdata_urls)
+        st.session_state.conversation = []
+        st.rerun()
 
-if st.sidebar.checkbox(
-    "Reverse Chat Order",
-    key="reverse_chat",
-    value=st.session_state.reverse_chat,
-    help="Reverse the order of the chat messages.",
-    ):
-    st.session_state.reverse_chat = not st.session_state.reverse_chat
-    st.rerun()
 
-st.sidebar.checkbox(
-    "Verbose Mode",
-    key="verbose_mode",
-    value=st.session_state.verbose_mode,
-    help="Toggle verbose output for debugging."
-)
-
-# --- Conversation Renderer ---
 def render_conversation():
     """Display the conversation history."""
     conv = st.session_state.conversation.copy()
@@ -71,46 +69,57 @@ def render_conversation():
     for chat in conv:
         if chat["role"] == "user":
             with st.chat_message("user"):
-                st.markdown(f"{chat['content']}")
+                st.markdown(chat["content"])
         else:
             with st.chat_message("assistant"):
-                st.markdown(f"{chat['content']}")
+                st.markdown(chat["content"])
 
-# --- Chat Input Form ---
-with st.form("chat_form", clear_on_submit=True):
-    user_input = st.text_input("Enter your message:", key="input")
-    col1, col2 = st.columns([0.1, 0.89])
-    with col1:
-        submitted = st.form_submit_button("Send")
-    with col2:
-        if st.form_submit_button("Clear Chat"):
-            st.session_state.agent = NetdataLLMAgent(st.session_state.netdata_urls)
-            st.session_state.conversation = []
-            st.rerun()
 
-if submitted and user_input:
-    st.session_state.conversation.append({"role": "user", "content": user_input})
-    continue_chat = len(st.session_state.conversation) > 1
+def chat_input():
+    """Render the chat input form and return user input."""
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("Enter your message:", key="input")
+        send_pressed = st.form_submit_button("Send")
+    return send_pressed, user_input
 
-    with st.spinner("Agent is thinking..."):
-        try:
-            if st.session_state.verbose_mode:
-                response = st.session_state.agent.chat(
-                    user_input,
-                    continue_chat=continue_chat,
-                    return_thinking=True,
-                    return_last=False,
-                )
-            else:
-                response = st.session_state.agent.chat(
-                    user_input,
-                    continue_chat=continue_chat,
-                    return_last=True,
-                )
-        except Exception as e:
-            response = f"Error: {e}"
 
-    st.session_state.conversation.append({"role": "agent", "content": response})
-    st.rerun()
+def main():
+    """Main function to run the Streamlit app."""
+    st.logo("./static/i-love-trouble.jpg", link="https://www.netdata.cloud/")
+    st.title("Netdata LLM Agent Chat")
 
-render_conversation()
+    init_session_state()
+    sidebar_config()
+
+    send_pressed, user_input = chat_input()
+
+    if send_pressed and user_input:
+        st.session_state.conversation.append({"role": "user", "content": user_input})
+        continue_chat = len(st.session_state.conversation) > 1
+
+        with st.spinner("Agent is thinking..."):
+            try:
+                if st.session_state.verbose_mode:
+                    response = st.session_state.agent.chat(
+                        user_input,
+                        continue_chat=continue_chat,
+                        return_thinking=True,
+                        return_last=False,
+                    )
+                else:
+                    response = st.session_state.agent.chat(
+                        user_input,
+                        continue_chat=continue_chat,
+                        return_last=True,
+                    )
+            except Exception as e:
+                response = f"Error: {e}"
+
+        st.session_state.conversation.append({"role": "agent", "content": response})
+        st.rerun()
+
+    render_conversation()
+
+
+if __name__ == "__main__":
+    main()
