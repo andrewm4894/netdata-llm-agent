@@ -4,7 +4,17 @@ An LLM agent for chatting with your netdata server's.
 
 See [example notebook](./example.ipynb) for more updated examples.
 
-Example:
+## App Example
+
+A little streamlit app that uses the agent to chat with your netdata server's.
+
+```python
+streamlit run app.py
+```
+
+![App Example](./static/app.png)
+
+## Code Example
 
 ```python
 from netdata_llm_agent import NetdataLLMAgent

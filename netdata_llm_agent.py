@@ -71,7 +71,8 @@ class NetdataLLMAgent:
             verbose: bool = False,
             continue_chat: bool = False,
             no_print: bool = True,
-            return_last: bool = False
+            return_last: bool = False,
+            return_thinking: bool = False
         ):
         """
         Chat with the NetdataLLMAgent.
@@ -82,15 +83,21 @@ class NetdataLLMAgent:
             continue_chat: If True, continue the chat from the last message. Default is False.
             no_print: If True, do not print the messages. Default is True.
             return_last: If True, return the last message content. Default is False.
+            return_thinking: If True, return the new messages. Default is False.
 
         Returns:
             If return_last is True, return the last message content.
+            If return_thinking is True, return the new messages.
         """
         if continue_chat:
             self.messages['messages'].append(HumanMessage(content=message))
         else:
             self.messages = {"messages": [HumanMessage(content=message)]}
-        self.messages = self.agent.invoke(self.messages)
+        messages_updated = self.agent.invoke(self.messages)
+        len_messages_updated = len(messages_updated["messages"])
+        len_self_messages = len(self.messages["messages"])
+        new_messages = messages_updated["messages"][-(len_messages_updated - len_self_messages):]
+        self.messages = messages_updated
         if not no_print:
             if verbose:
                 for m in self.messages["messages"]:
@@ -99,3 +106,5 @@ class NetdataLLMAgent:
                     self.messages["messages"][-1].pretty_print()
         if return_last:
             return self.messages["messages"][-1].content
+        if return_thinking:
+            return new_messages
