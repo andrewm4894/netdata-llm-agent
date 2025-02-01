@@ -9,8 +9,11 @@ See [example notebook](./example.ipynb) for more updated examples.
 Some things i'd like to do:
 
 - [ ] make pip installable.
-- [ ] make cli tool for chating with agent.
+- [ ] probably optimize langchain implementation more.
+- [ ] add more advanced langchain functionality around memory etc.
+- [ ] make cli tool for chatting with agent.
 - [ ] dockerize it all.
+- [ ] iterate and polish streamlit app.
 - [ ] add anthropic support.
 - [ ] optimize and expand custom netdata tool usage and structure etc.
 - [ ] add more examples.
