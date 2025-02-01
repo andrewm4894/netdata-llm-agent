@@ -8,7 +8,8 @@ from netdata_tools import (
     get_charts,
     get_chart_info,
     get_chart_data,
-    get_alarms
+    get_alarms,
+    get_current_metrics,
 )
 
 SYSTEM_PROMPT = """
@@ -20,6 +21,7 @@ The following tools are available:
 - get_chart_info(netdata_host_url, chart) : Get Netdata chart info for a specific chart.
 - get_chart_data(netdata_host_url, chart, after, before, points) : Get Netdata chart data for a specific chart.
 - get_alarms(netdata_host_url) : Get Netdata alarms.
+- get_current_metrics(netdata_host_url) : Get current metrics values for all charts, no time range, just the current values.
 
 General Notes:
 - When pulling data from get_chart_data() you can leverage the points param to aggregate data points given the specific after and before time range.
@@ -57,6 +59,7 @@ class NetdataLLMAgent:
             tool(get_chart_info, parse_docstring=True),
             tool(get_chart_data, parse_docstring=True),
             tool(get_alarms, parse_docstring=True),
+            tool(get_current_metrics, parse_docstring=True),
         ]
 
         self.agent = create_react_agent(
