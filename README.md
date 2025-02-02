@@ -165,7 +165,7 @@ Agent: You're welcome! I'm glad I could help. If you have any more questions or 
 ## Code Example
 
 ```python
-from netdata_llm_agent import NetdataLLMAgent
+from netdata_llm_agent.agent import NetdataLLMAgent
 
 # list of netdata urls to interact with
 netdata_urls = [
