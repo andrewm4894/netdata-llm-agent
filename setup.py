@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="netdata-llm-agent",
-    version="0.1.0",
+    version="0.2.0",
     author="Andrew Maguire",
     author_email="andrewm4894@gmail.com",
     description="A language model agent that interacts with Netdata API",
