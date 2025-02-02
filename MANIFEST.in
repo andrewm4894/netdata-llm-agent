@@ -1,0 +1,5 @@
+include README.md
+include LICENSE
+include requirements.txt
+include examples/*
+recursive-include netdata_llm_agent/static *

@@ -1,5 +1,12 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Streamlit app for the Netdata LLM Agent Chat.
+"""
+
 import streamlit as st
-from netdata_llm_agent import NetdataLLMAgent
+from netdata_llm_agent.agent import NetdataLLMAgent
 
 DEFAULT_NETDATA_URLS = [
     "http://localhost:19999/",

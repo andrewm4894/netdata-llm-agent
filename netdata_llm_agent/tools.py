@@ -1,4 +1,9 @@
-# ./netdata_llm_tools.py
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Tools for Netdata LLM Agent.
+"""
 
 import json
 import requests

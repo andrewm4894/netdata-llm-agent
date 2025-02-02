@@ -1,10 +1,15 @@
-# ./netdata_llm_agent.py
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+NetdataLLMAgent is a language model agent that can interact with Netdata API to provide information about Netdata charts, chart info, and chart data.
+"""
 
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 
-from netdata_llm_tools import (
+from netdata_llm_agent.tools import (
     get_info,
     get_charts,
     get_chart_info,

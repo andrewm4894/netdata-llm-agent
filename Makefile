@@ -3,6 +3,8 @@
 .PHONY: pre-commit
 .PHONY: app
 .PHONY: cli
+.PHONY: build
+.PHONY: publish
 
 requirements:
 	@pip-compile requirements.compile -o requirements.txt
@@ -22,3 +24,9 @@ app:
 
 cli:
 	@python netdata_llm_cli.py
+
+build:
+	@python -m build
+
+publish:
+	@twine upload dist/*

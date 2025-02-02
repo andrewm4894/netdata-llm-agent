@@ -1,14 +1,14 @@
-#!/usr/bin/env python
-"""
-netdata_llm_cli.py
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
+"""
 A simple CLI for interacting with the Netdata LLM Agent.
 """
 
 import argparse
 import os
 from dotenv import load_dotenv
-from netdata_llm_agent import NetdataLLMAgent
+from netdata_llm_agent.agent import NetdataLLMAgent
 
 load_dotenv()
 
