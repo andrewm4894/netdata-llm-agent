@@ -1,5 +1,7 @@
 # Netdata LLM Agent
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/andrewm4894/netdata-llm-agent)
+
 An LLM agent for chatting with your netdata server's.
 
 - [App](#app-example) - A little streamlit app that uses the agent to chat with your netdata server's.
