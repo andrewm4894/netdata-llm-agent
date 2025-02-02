@@ -2,7 +2,9 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/andrewm4894/netdata-llm-agent)
 
-![PyPI - Version](https://img.shields.io/pypi/v/netdata-llm-agent)
+<a target="_blank" href="https://pypi.org/project/netdata-llm-agent">
+  <img alt="PyPI - Version" src="https://img.shields.io/pypi/v/netdata-llm-agent">
+</a>
 <a target="_blank" href="https://colab.research.google.com/github/andrewm4894/netdata-llm-agent/blob/main/notebooks/examples.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
