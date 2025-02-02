@@ -4,6 +4,17 @@ An LLM agent for chatting with your netdata server's.
 
 See [example notebook](./example.ipynb) for more updated examples.
 
+Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_tools.py)):
+- `get_info(netdata_host_url)` : Get Netdata info about a node.
+- `get_charts(netdata_host_url, search_term)` : Get Netdata charts, optionally filter by search_term.
+- `get_chart_info(netdata_host_url, chart)` : Get Netdata chart info for a specific chart.
+- `get_chart_data(netdata_host_url, chart, after, before, points, options, df_freq)` : Get Netdata chart data for a specific chart. Optionally filter by after, before, points, options, and df_freq. options can be used to add optional flags for example 'anomaly-bit' will return anomaly rates rather than raw metric values.
+- `get_alarms(netdata_host_url, all, active)` : Get Netdata alarms. all=True to get all alarms, active=True to get active alarms (warning or critical).
+- `get_current_metrics(netdata_host_url, search_term)` : Get current metrics values for all charts, no time range, just the current values for all dimensions on all charts. Optionally filter by search_term on chart name.
+- `get_anomaly_rates(netdata_host_url, after, before, search_term)` : Get anomaly rates for a specific time frame for all charts or optionally filter by search_term on chart name.
+- `get_netdata_docs_sitemap(search_term)` : Get Netdata docs sitemap to list available Netdata documentation pages. Use search_term to filter by a specific term.
+- `get_netdata_docs_page(url)` : Get Netdata docs page content for a specific docs page url on learn.netdata.cloud.
+
 ## TODO
 
 Some things i'd like to do:
@@ -11,18 +22,24 @@ Some things i'd like to do:
 - [ ] make pip installable.
 - [ ] probably optimize langchain implementation more.
 - [ ] add more advanced langchain functionality around memory etc.
-- [ ] make cli tool for chatting with agent.
+- [x] make cli tool for chatting with agent.
 - [ ] dockerize it all.
 - [ ] iterate and polish streamlit app.
-- [ ] add anthropic support.
+- [x] add anthropic support.
 - [ ] optimize and expand custom netdata tool usage and structure etc.
 - [ ] add more examples.
-- [ ] add ability to use local models using ollama.
+- [x] add ability to use local models using ollama.
 - [ ] add deeper context and knowledge of netdata and its tools.
 
 ## App Example
 
-A little streamlit app that uses the agent to chat with your netdata server's.
+A little streamlit app that uses the agent to chat with your netdata server's ([source](./netdata_llm_app.py)).
+
+```bash
+make app
+```
+
+or
 
 ```python
 streamlit run app.py
@@ -32,8 +49,13 @@ streamlit run app.py
 
 ## CLI Example
 
+A very simplistic cli tool that uses the agent to chat with your netdata server's on command line ([source](./netdata_llm_cli.py)).
+
+```base
+make cli
+```
+
 ```markdown
-(venv) PS C:\Users\andre\Documents\repos\netdata-agent> make run-cli
 Welcome to the Netdata LLM Agent CLI!
 Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
 Type 'exit' or 'quit' to end the session.

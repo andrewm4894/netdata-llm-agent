@@ -1,8 +1,8 @@
 .PHONY: requirements
 .PHONY: requirements-install
 .PHONY: pre-commit
-.PHONY: run-app
-.PHONY: run-cli
+.PHONY: app
+.PHONY: cli
 
 requirements:
 	@pip-compile requirements.compile -o requirements.txt
@@ -17,8 +17,8 @@ pre-commit:
 	@pre-commit run --all-files
 	@pre-commit autoupdate
 
-run-app:
+app:
 	@streamlit run netdata_llm_app.py
 
-run-cli:
+cli:
 	@python netdata_llm_cli.py

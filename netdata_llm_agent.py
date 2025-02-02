@@ -1,6 +1,5 @@
 # ./netdata_llm_agent.py
 
-from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
@@ -12,18 +11,25 @@ from netdata_llm_tools import (
     get_chart_data,
     get_alarms,
     get_current_metrics,
+    get_anomaly_rates,
+    get_netdata_docs_sitemap,
+    get_netdata_docs_page,
 )
+
 
 SYSTEM_PROMPT = """
 You are are helpful Netdata assistant. Users can ask you about Netdata charts, chart info, and chart data.
 
 The following tools are available:
-- get_info(netdata_host_url) : Get Netdata info.
+- get_info(netdata_host_url) : Get Netdata info about the node.
 - get_charts(netdata_host_url, search_term) : Get Netdata charts, optionally filter by search_term.
 - get_chart_info(netdata_host_url, chart) : Get Netdata chart info for a specific chart.
-- get_chart_data(netdata_host_url, chart, after, before, points, df_freq) : Get Netdata chart data for a specific chart.
+- get_chart_data(netdata_host_url, chart, after, before, points, options, df_freq) : Get Netdata chart data for a specific chart. Optionally filter by after, before, points, options, and df_freq. options can be used to add optional flags for example 'anomaly-bit' will return anomaly rates rather than raw metric values.
 - get_alarms(netdata_host_url, all, active) : Get Netdata alarms. all=True to get all alarms, active=True to get active alarms (warning or critical).
 - get_current_metrics(netdata_host_url, search_term) : Get current metrics values for all charts, no time range, just the current values for all dimensions on all charts. Optionally filter by search_term on chart name.
+- get_anomaly_rates(netdata_host_url, after, before, search_term) : Get anomaly rates for a specific time frame for all charts or optionally filter by search_term on chart name.
+- get_netdata_docs_sitemap(search_term) : Get Netdata docs sitemap to list available Netdata documentation pages. Use search_term to filter by a specific term.
+- get_netdata_docs_page(url) : Get Netdata docs page content for a specific docs page url on learn.netdata.cloud.
 
 General Notes:
 - Every netdata node is different and may have different charts available so it's usually best to check the available charts with get_charts() first.
@@ -34,6 +40,13 @@ General Notes:
 - Use get_charts() with the search_term param to filter charts by a specific term if unsure of the chart name.
 - Once you have the chart name you can use get_chart_info() to get more detailed information about the chart and get_chart_data() to get the data for the chart.
 """
+
+
+SUPPORTED_MODELS = {
+    "openai": ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"],
+    "anthropic": ["claude-3-5-sonnet-20241022"],
+    "ollama": ["llama3.1"],
+}
 
 
 class NetdataLLMAgent:
@@ -55,14 +68,12 @@ class NetdataLLMAgent:
         platform: str = "openai",
     ):
         self.netdata_host_urls = netdata_host_urls
-        self.system_prompt = self._create_system_prompt(system_prompt, netdata_host_urls)
+        self.system_prompt = self._create_system_prompt(
+            system_prompt, netdata_host_urls
+        )
         self.messages = {"messages": []}
         self.platform = platform
-        self.llm = (
-            ChatOpenAI(model=model)
-            if platform == "openai"
-            else ValueError("Only openai platform is supported.")
-        )
+        self.llm = self._create_llm(model)
         self.tools = [
             tool(get_info, parse_docstring=True),
             tool(get_charts, parse_docstring=True),
@@ -70,11 +81,41 @@ class NetdataLLMAgent:
             tool(get_chart_data, parse_docstring=True),
             tool(get_alarms, parse_docstring=True),
             tool(get_current_metrics, parse_docstring=True),
+            tool(get_anomaly_rates, parse_docstring=True),
+            tool(get_netdata_docs_sitemap, parse_docstring=True),
+            tool(get_netdata_docs_page, parse_docstring=True),
         ]
 
         self.agent = create_react_agent(
             self.llm, tools=self.tools, prompt=SystemMessage(content=self.system_prompt)
         )
+
+    def _create_llm(self, model: str):
+        """
+        Create the language model agent.
+
+        Args:
+            model: Language model to use.
+        """
+        if self.platform == "openai":
+            from langchain_openai import ChatOpenAI
+
+            if model in SUPPORTED_MODELS["openai"]:
+                return ChatOpenAI(model=model)
+        elif self.platform == "anthropic":
+            from langchain_anthropic import ChatAnthropic
+
+            if model in SUPPORTED_MODELS["anthropic"]:
+                return ChatAnthropic(model=model)
+        elif self.platform == "ollama":
+            from langchain_ollama import ChatOllama
+
+            if model not in SUPPORTED_MODELS["ollama"]:
+                return ChatOllama(model=model)
+        else:
+            raise ValueError(
+                f"Platform {self.platform} and model {model} not supported."
+            )
 
     def _create_system_prompt(self, base_prompt: str, netdata_host_urls: list) -> str:
         """

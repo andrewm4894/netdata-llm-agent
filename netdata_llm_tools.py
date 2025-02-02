@@ -3,6 +3,7 @@
 import json
 import requests
 import pandas as pd
+from markdownify import markdownify as md
 
 
 def get_info(netdata_host_url: str) -> str:
@@ -101,6 +102,7 @@ def get_chart_data(
     after: int = -60,
     before: int = 0,
     points: int = 60,
+    options: str = None,
     df_freq: str = "5s",
 ) -> str:
     """
@@ -112,6 +114,7 @@ def get_chart_data(
         after: Seconds before now or timestamp in seconds.
         before: Seconds after now or timestamp in seconds.
         points: Number of points to retrieve. Can be used to aggregate data.
+        options: Additional options to pass to the API. 'anomaly-bit' for anomaly rate instead of raw metric values.
         df_freq: Frequency for the pandas DataFrame. Can be used to resample and aggregate data for larger time ranges.
 
     Returns:
@@ -125,6 +128,8 @@ def get_chart_data(
         "format": "json",
         "points": points,
     }
+    if options:
+        query_params["options"] = options
     resp = requests.get(url, params=query_params, timeout=5)
     resp_json = resp.json()
     df = pd.DataFrame(resp_json["data"], columns=resp_json["labels"])
@@ -203,3 +208,69 @@ def get_current_metrics(netdata_host_url: str, search_term: str = None) -> str:
     }
 
     return json.dumps(all_metrics, indent=2)
+
+
+def get_anomaly_rates(
+    netdata_host_url: str, after: int = -60, before: int = 0, search_term: str = None
+) -> str:
+    """
+    Calls Netdata /api/v1/weights?method=anomaly-rate to retrieve anomaly rates for all charts for a given time range or optionally filter by search_term on chart name.
+
+    Args:
+        netdata_host_url: Netdata host url.
+        after: Seconds before now or timestamp in seconds.
+        before: Seconds after now or timestamp in seconds.
+        search_term: Optional search term to filter the anomaly rates by chart name.
+
+    Returns:
+        JSON string with anomaly rates for all charts.
+    """
+    url = f"{netdata_host_url}/api/v1/weights?method=anomaly-rate&after={after}&before={before}"
+    resp = requests.get(url, timeout=5)
+    r_json = resp.json()
+    contexts = r_json["contexts"]
+    anomaly_rates = []
+    for context in contexts:
+        for c in contexts[context]["charts"]:
+            if search_term and search_term not in c:
+                continue
+            anomaly_rates.append({f"{c}": contexts[context]["charts"][c]["dimensions"]})
+
+    return json.dumps(anomaly_rates, indent=2)
+
+
+def get_netdata_docs_sitemap(search_term: str = None) -> str:
+    """
+    Calls Netdata Learn (docs site) /sitemap.xml to retrieve the sitemap for the Netdata documentation.
+
+    Args:
+        search_term: Optional search term to filter the sitemap by URL.
+
+    Returns:
+        JSON string with the sitemap URLs.
+    """
+    url = "https://learn.netdata.cloud/sitemap.xml"
+    resp = requests.get(url, timeout=5)
+    sitemap = resp.text
+    sitemap = [
+        s.split("<loc>")[1].split("</loc>")[0] for s in sitemap.split("<url>")[1:]
+    ]
+    if search_term:
+        sitemap = [s for s in sitemap if search_term in s]
+
+    return json.dumps(sitemap, indent=2)
+
+
+def get_netdata_docs_page(url: str) -> str:
+    """
+    Calls Netdata Learn (docs site) to retrieve the content of a specific documentation page.
+
+    Args:
+        url: URL of the documentation page.
+
+    Returns:
+        Markdown rendering of the HTML content of the documentation page.
+    """
+    resp = requests.get(url, timeout=5)
+
+    return md(resp.text)
