@@ -2,6 +2,10 @@
 
 An LLM agent for chatting with your netdata server's.
 
+- [App](#app-example) - A little streamlit app that uses the agent to chat with your netdata server's.
+- [CLI](#cli-example)- A very simplistic cli tool that uses the agent to chat with your netdata server's on command line.
+- [Code](#code-example) - A code example of how to chat with the agent in python.
+
 See [example notebook](./example.ipynb) for more updated examples.
 
 Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_tools.py)):
