@@ -1,7 +1,22 @@
 from setuptools import setup, find_packages
 
+def read_requirements(filename):
+    """Read requirements from file, handling comments and empty lines."""
+    with open(filename) as f:
+        return [
+            line.strip()
+            for line in f
+            if line.strip() and not line.startswith('#') and not line.startswith('-r')
+        ]
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
+
+# Try to read from requirements.txt first, fall back to requirements.compile
+try:
+    requirements = read_requirements("requirements.txt")
+except FileNotFoundError:
+    requirements = read_requirements("requirements.compile")
 
 setup(
     name="netdata-llm-agent",
@@ -24,21 +39,10 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     python_requires=">=3.8",
-    install_requires=[
-        "langgraph",
-        "langchain-core",
-        "langchain-openai",
-        "langchain-anthropic",
-        "langchain-ollama",
-        "requests",
-        "pandas",
-        "markdownify",
-        "streamlit",
-        "python-dotenv",
-    ],
+    install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "netdata-llm=netdata_llm_agent.cli:main",
+            "netdata-llm-cli=netdata_llm_agent.cli:main",
             "netdata-llm-app=netdata_llm_agent.app:run_app",
         ],
     },
