@@ -2,15 +2,21 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/andrewm4894/netdata-llm-agent)
 
+![PyPI - Version](https://img.shields.io/pypi/v/netdata-llm-agent)
+<a target="_blank" href="https://colab.research.google.com/github/andrewm4894/netdata-llm-agent/blob/main/notebooks/examples.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
 An LLM agent for chatting with your netdata server's.
 
+- [Installation](#installation) - How to install the package.
 - [App](#app-example) - A little streamlit app that uses the agent to chat with your netdata server's.
-- [CLI](#cli-example)- A very simplistic cli tool that uses the agent to chat with your netdata server's on command line.
+- [CLI](#cli-example) - A very simplistic cli tool that uses the agent to chat with your netdata server's on command line.
 - [Code](#code-example) - A code example of how to chat with the agent in python.
 
-See [example notebook](./example.ipynb) for more updated examples.
+See [example notebook](./notebooks/examples.ipynb) for more updated examples.
 
-Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_tools.py)):
+Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_agent/tools.py)):
 - `get_info(netdata_host_url)` : Get Netdata info about a node.
 - `get_charts(netdata_host_url, search_term)` : Get Netdata charts, optionally filter by search_term.
 - `get_chart_info(netdata_host_url, chart)` : Get Netdata chart info for a specific chart.
@@ -21,44 +27,45 @@ Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_
 - `get_netdata_docs_sitemap(search_term)` : Get Netdata docs sitemap to list available Netdata documentation pages. Use search_term to filter by a specific term.
 - `get_netdata_docs_page(url)` : Get Netdata docs page content for a specific docs page url on learn.netdata.cloud.
 
-## TODO
+## Installation
 
-Some things i'd like to do:
+```bash
+# installing from pypi
+pip install netdata-llm-agent
 
-- [ ] make pip installable.
-- [ ] probably optimize langchain implementation more.
-- [ ] add more advanced langchain functionality around memory etc.
-- [x] make cli tool for chatting with agent.
-- [ ] dockerize it all.
-- [ ] iterate and polish streamlit app.
-- [x] add anthropic support.
-- [ ] optimize and expand custom netdata tool usage and structure etc.
-- [ ] add more examples.
-- [x] add ability to use local models using ollama.
-- [ ] add deeper context and knowledge of netdata and its tools.
+# installing from source
+git clone https://github.com/andrewm4894/netdata-llm-agent.git
+cd netdata-llm-agent
+python -m venv .venv
+source .venv/bin/activate
+make requirements-install
+make cli
+```
 
 ## App Example
 
-A little streamlit app that uses the agent to chat with your netdata server's ([source](./netdata_llm_app.py)).
+A little streamlit app that uses the agent to chat with your netdata server's ([source](./netdata_llm_agent/app.py)).
 
 ```bash
+# if installed via pip
+netdata-llm-app
+
+# if working from source
 make app
 ```
 
-or
-
-```python
-streamlit run app.py
-```
-
-![App Example](./static/app.png)
+![App Example](./netdata_llm_agent/static/app.png)
 
 ## CLI Example
 
-A very simplistic cli tool that uses the agent to chat with your netdata server's on command line ([source](./netdata_llm_cli.py)).
+A very simplistic cli tool that uses the agent to chat with your netdata server's on command line ([source](./netdata_llm_agent/cli.py)).
 
-```base
+```bash
+# if cloning the repo
 make cli
+
+# or if installed via pip
+netdata-llm-cli
 ```
 
 ```markdown
