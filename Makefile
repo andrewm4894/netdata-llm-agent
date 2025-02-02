@@ -3,6 +3,7 @@
 .PHONY: pre-commit
 .PHONY: app
 .PHONY: cli
+.PHONY: bump-version-patch bump-version-minor bump-version-major
 .PHONY: build
 .PHONY: publish
 
@@ -20,10 +21,19 @@ pre-commit:
 	@pre-commit autoupdate
 
 app:
-	@streamlit run netdata_llm_app.py
+	@streamlit run netdata_llm_agent/app.py
 
 cli:
-	@python netdata_llm_cli.py
+	@python netdata_llm_agent/cli.py
+
+bump-version-patch:
+	@bump2version patch
+
+bump-version-minor:
+	@bump2version minor
+
+bump-version-major:
+	@bump2version major
 
 build:
 	@python -m build

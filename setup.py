@@ -39,7 +39,7 @@ setup(
     entry_points={
         "console_scripts": [
             "netdata-llm=netdata_llm_agent.cli:main",
-            "netdata-llm-app=netdata_llm_agent.app:main",
+            "netdata-llm-app=netdata_llm_agent.app:run_app",
         ],
     },
 )

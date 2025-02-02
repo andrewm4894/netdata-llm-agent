@@ -94,10 +94,10 @@ def main():
     """Main function to run the Streamlit app."""
     st.set_page_config(
         page_title="Netdata LLM Agent Chat",
-        page_icon="./static/i-love-trouble.jpg",
+        page_icon="./netdata_llm_agent/static/i-love-trouble.jpg",
         layout="wide",
     )
-    st.logo("./static/i-love-trouble.jpg", link="https://www.netdata.cloud/")
+    st.logo("./netdata_llm_agent/static/i-love-trouble.jpg", link="https://www.netdata.cloud/")
     st.markdown(
         "<h1 style='color: #00AB44;'>Netdata LLM Agent Chat</h1>",
         unsafe_allow_html=True,
@@ -134,6 +134,15 @@ def main():
         st.rerun()
 
     render_conversation()
+
+
+def run_app():
+    """Entry point for the Streamlit app when run as a module."""
+    import streamlit.web.cli as stcli
+    import sys
+
+    sys.argv = ["streamlit", "run", __file__]
+    sys.exit(stcli.main())
 
 
 if __name__ == "__main__":
