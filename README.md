@@ -158,37 +158,95 @@ Agent: You're welcome! I'm glad I could help. If you have any more questions or 
 ```python
 from netdata_llm_agent import NetdataLLMAgent
 
-# create agent
-agent = NetdataLLMAgent(base_url='https://london3.my-netdata.io/')
+# list of netdata urls to interact with
+netdata_urls = [
+    'https://localhost:19999/',
+    'https://london3.my-netdata.io/',
+    'https://bangalore.my-netdata.io/',
+    'https://newyork.my-netdata.io/',
+    'https://sanfrancisco.my-netdata.io/',
+    'https://singapore.my-netdata.io/',
+    'https://toronto.my-netdata.io/',
+]
 
-# chat with agent
-agent.chat('How much disk space do i have?')
+# create agent
+agent = NetdataLLMAgent(netdata_urls, model='gpt-4o-mini')
+# create agent using anthropic
+# agent = NetdataLLMAgent(netdata_urls, model='claude-3-5-sonnet-20241022', platform='anthropic')
+# create agent using ollama
+# agent = NetdataLLMAgent(netdata_urls, model='llama3.1', platform='ollama')
+
+# chat with the agent
+agent.chat('How much disk space is on london?', verbose=True, no_print=False)
 ```
 
 Response:
 
-```text
+```markdown
 ================================[1m Human Message [0m=================================
 
-How much disk space do i have?
+How much disk space is on london?
 ==================================[1m Ai Message [0m==================================
 Tool Calls:
-  get_netdata_info (call_z3UdHeDcsWZgm2w3KTsSLJa3)
- Call ID: call_z3UdHeDcsWZgm2w3KTsSLJa3
+  get_charts (call_Ail79vhFSkyZeCBCleqC5pTE)
+ Call ID: call_Ail79vhFSkyZeCBCleqC5pTE
   Args:
-    base_url: https://london3.my-netdata.io/
+    netdata_host_url: https://london3.my-netdata.io/
 =================================[1m Tool Message [0m=================================
-Name: get_netdata_info
+Name: get_charts
 
-netdata version = v2.2.0-70-nightly
-hostname = registry.my-netdata.io
-operating system = Debian GNU/Linux
-operating system version = debian
-cores total = 4
-total disk space = 171799128064
-ram total = 8326430720
+[
+  [
+    "system.idlejitter",
+    "CPU Idle Jitter (system.idlejitter)"
+  ],
+  ...(lots of charts - removed for the readme)
+  [
+    "netdata.statsd_events",
+    "Events processed by the netdata statsd server (netdata.statsd_events)"
+  ],
+  ...(lots of charts - removed for the readme)
+]
+==================================[1m Ai Message [0m==================================
+Tool Calls:
+  get_chart_data (call_ExvOtkjnmJMnGQVjP2wOaeE7)
+ Call ID: call_ExvOtkjnmJMnGQVjP2wOaeE7
+  Args:
+    netdata_host_url: https://london3.my-netdata.io/
+    chart: disk_space./
+=================================[1m Tool Message [0m=================================
+Name: get_chart_data
 
+    avail     used  reserved for root
+112.80312 38.20478           6.435379
+112.80304 38.20486           6.435379
+112.80283 38.20507           6.435379
+112.80276 38.20515           6.435379
+112.80270 38.20520           6.435379
+112.80269 38.20521           6.435379
+112.80264 38.20527           6.435379
+112.80259 38.20532           6.435379
+112.80248 38.20542           6.435379
+112.80241 38.20549           6.435379
+112.80232 38.20558           6.435379
+112.80225 38.20566           6.435379
 ==================================[1m Ai Message [0m==================================
 
-You have a total disk space of approximately 171.8 GB.
+On the London server, the current disk space usage is as follows:
+
+- **Available Disk Space:** Approximately 112.80 GB
+- **Used Disk Space:** Approximately 38.20 GB
+- **Reserved for root:** Approximately 6.44 GB
+
+Would you like to know anything else?
+==================================[1m Ai Message [0m==================================
+
+On the London server, the current disk space usage is as follows:
+
+- **Available Disk Space:** Approximately 112.80 GB
+- **Used Disk Space:** Approximately 38.20 GB
+- **Reserved for root:** Approximately 6.44 GB
+
+Would you like to know anything else?
+
 ```
