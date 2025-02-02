@@ -190,29 +190,33 @@ Response:
 How much disk space is on london?
 ==================================[1m Ai Message [0m==================================
 Tool Calls:
-  get_charts (call_Ail79vhFSkyZeCBCleqC5pTE)
- Call ID: call_Ail79vhFSkyZeCBCleqC5pTE
+  get_charts (call_7j6IPWtLVu4OwvVFywmHmYIa)
+ Call ID: call_7j6IPWtLVu4OwvVFywmHmYIa
   Args:
     netdata_host_url: https://london3.my-netdata.io/
+    search_term: disk
 =================================[1m Tool Message [0m=================================
 Name: get_charts
 
 [
   [
-    "system.idlejitter",
-    "CPU Idle Jitter (system.idlejitter)"
+    "netdata.dbengine_query_pages_disk_load",
+    "Netdata Query Pages Loaded from Disk (netdata.dbengine_query_pages_disk_load)"
   ],
-  ...(lots of charts - removed for the readme)
   [
-    "netdata.statsd_events",
-    "Events processed by the netdata statsd server (netdata.statsd_events)"
+    "disk_space./",
+    "Disk Space Usage (disk_space./)"
   ],
-  ...(lots of charts - removed for the readme)
+  ...
+  [
+    "app.certbot_disk_logical_io",
+    "Applications Groups disk logical IO (app.certbot_disk_logical_io)"
+  ]
 ]
 ==================================[1m Ai Message [0m==================================
 Tool Calls:
-  get_chart_data (call_ExvOtkjnmJMnGQVjP2wOaeE7)
- Call ID: call_ExvOtkjnmJMnGQVjP2wOaeE7
+  get_chart_data (call_fdvYLm2ntI6W2VwwMNaLPavO)
+ Call ID: call_fdvYLm2ntI6W2VwwMNaLPavO
   Args:
     netdata_host_url: https://london3.my-netdata.io/
     chart: disk_space./
@@ -220,35 +224,35 @@ Tool Calls:
 Name: get_chart_data
 
     avail     used  reserved for root
-112.80312 38.20478           6.435379
-112.80304 38.20486           6.435379
-112.80283 38.20507           6.435379
-112.80276 38.20515           6.435379
-112.80270 38.20520           6.435379
-112.80269 38.20521           6.435379
-112.80264 38.20527           6.435379
-112.80259 38.20532           6.435379
-112.80248 38.20542           6.435379
-112.80241 38.20549           6.435379
-112.80232 38.20558           6.435379
-112.80225 38.20566           6.435379
+112.77004 38.23786           6.435379
+112.76998 38.23793           6.435379
+112.76992 38.23798           6.435379
+112.76983 38.23807           6.435379
+112.76977 38.23814           6.435379
+112.76972 38.23818           6.435379
+112.76966 38.23825           6.435379
+112.76953 38.23837           6.435379
+112.76926 38.23865           6.435379
+112.76921 38.23869           6.435379
+112.76912 38.23878           6.435379
+112.76907 38.23883           6.435379
 ==================================[1m Ai Message [0m==================================
 
-On the London server, the current disk space usage is as follows:
+The disk space on the London Netdata server is as follows:
 
-- **Available Disk Space:** Approximately 112.80 GB
-- **Used Disk Space:** Approximately 38.20 GB
-- **Reserved for root:** Approximately 6.44 GB
+- **Available Disk Space:** Approximately **112.77 GiB**
+- **Used Disk Space:** Approximately **38.24 GiB**
+- **Reserved for Root:** Approximately **6.44 GiB**
 
-Would you like to know anything else?
+Let me know if you need more information!
 ==================================[1m Ai Message [0m==================================
 
-On the London server, the current disk space usage is as follows:
+The disk space on the London Netdata server is as follows:
 
-- **Available Disk Space:** Approximately 112.80 GB
-- **Used Disk Space:** Approximately 38.20 GB
-- **Reserved for root:** Approximately 6.44 GB
+- **Available Disk Space:** Approximately **112.77 GiB**
+- **Used Disk Space:** Approximately **38.24 GiB**
+- **Reserved for Root:** Approximately **6.44 GiB**
 
-Would you like to know anything else?
+Let me know if you need more information!
 
 ```
