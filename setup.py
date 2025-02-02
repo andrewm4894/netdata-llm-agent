@@ -1,13 +1,15 @@
 from setuptools import setup, find_packages
 
+
 def read_requirements(filename):
     """Read requirements from file, handling comments and empty lines."""
     with open(filename) as f:
         return [
             line.strip()
             for line in f
-            if line.strip() and not line.startswith('#') and not line.startswith('-r')
+            if line.strip() and not line.startswith("#") and not line.startswith("-r")
         ]
+
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
