@@ -234,7 +234,9 @@ requests==2.32.3
 requests-toolbelt==1.0.0
     # via langsmith
 rich==13.9.4
-    # via streamlit
+    # via
+    #   -r requirements.compile
+    #   streamlit
 rpds-py==0.22.3
     # via
     #   jsonschema
