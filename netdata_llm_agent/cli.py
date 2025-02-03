@@ -83,6 +83,7 @@ def main():
     welcome_message += "\nType your query about Netdata (e.g., charts, alarms, metrics) and press Enter."
     welcome_message += "\nType '/exit', '/quit' or '/bye' to end the session."
     welcome_message += "\nType '/save' to save the chat history to a file."
+    welcome_message += "\nType '/good' to save with good_ prefix, '/bad' to save with bad_ prefix (useful for debugging in langsmith)."
     welcome_message += "\nType '/reset' to clear chat history and restart the agent.\n"
     print_and_save_message(welcome_message, chat_history)
 
@@ -106,10 +107,12 @@ def main():
             )
             continue
 
-        if user_input.lower() == "/save":
+        if user_input.lower() in ("/save", "/good", "/bad"):
             os.makedirs("example_chats", exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"example_chats/{timestamp}_{str(uuid.uuid4())[:8]}.txt"
+            if user_input.lower() in ("/good", "/bad"):
+                filename = f"example_chats/{user_input[1:]}_{timestamp}_{str(uuid.uuid4())[:8]}.txt"
             with open(filename, "w", encoding="utf-8") as f:
                 for entry in chat_history:
                     f.write(f"{entry}\n")

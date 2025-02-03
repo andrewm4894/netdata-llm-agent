@@ -1,0 +1,34 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/good' to save with good_ prefix, '/bad' to save with bad_ prefix (useful for debugging in langsmith).
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: any alarms on my local host in the last few hours?
+----------------------------------------------------------------------------------------------------
+Agent: There are currently no active alarms on your local host in the last few hours.
+
+----------------------------------------------------------------------------------------------------
+You: what metrics look most anomalous over the last hour?
+----------------------------------------------------------------------------------------------------
+Agent: Here are the metrics that appear most anomalous over the last hour, with their respective anomaly rates:
+
+1. **app.DisplayLinkTrayApp_vmem_usage**: 0.875
+2. **app.Realtek_HD_Audio_Universal_Service_vmem_usage**: 0.9166667
+3. **user.DESKTOP-EPFRI6A/andre_vmem_usage**: 0.9583333
+4. **app.Windows_Event_Log_mem_page_faults (minor)**: 0.7916667
+5. **app.Realtek_HD_Audio_Universal_Service_fds_open (handles)**: 0.9166667
+6. **app.Service_PenService_fds_open (handles)**: 0
+7. **app.User_Profile_Service_fds_open (handles)**: 0.75
+8. **app.Hyper-V_Virtual_Machine_Management_fds_open (handles)**: 0.375
+9. **app.Docker_Desktop_Service_fds_open (handles)**: 0.625
+10. **app.Background_Tasks_Infrastructure_Service_processes**: 0.4583333
+11. **app.Server_threads**: 0.6666667
+
+These metrics indicate varying degrees of anomalies, with the rates suggesting how unusual the values have been.
+
+----------------------------------------------------------------------------------------------------
+You: /good

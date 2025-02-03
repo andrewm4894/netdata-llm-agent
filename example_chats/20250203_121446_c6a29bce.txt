@@ -1,0 +1,73 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: can you give me a summary of the main headline metrics of importance on my local host over the last hour? anything of note i should debug or explore more?
+----------------------------------------------------------------------------------------------------
+Agent: Here's a summary of the main headline metrics from your local host over the last hour, including items of note for debugging or further exploration:
+
+### 1. CPU Utilization:
+- **Overall CPU Utilization**: 
+  - **User Space**: Average at approximately 5-10%
+  - **System Space**: Higher spikes at times reaching 17.4%
+
+### 2. Memory Usage:
+- **Total Memory Used**: 13,051.84 MiB
+- **Free Memory Available**: 3,101.68 MiB
+- **Swap Memory**: 
+  - **Used**: 16,002.82 MiB
+  - **Free**: 12,438.71 MiB
+
+### 3. Disk Activity:
+- **Disk I/O Activity**: 
+  - Very low read/write activities, indicating minimal disk operations.
+  - Some application-specific metrics show writes around -2387.91 KiB/s indicating indicates possible overflow or inefficiencies to check.
+
+### 4. Networking:
+- Networking metrics are stable, with 
+  - received data at approximately 52.67 kilobits/s and 
+  - some send operations showing unusual outbound values (around -196.19).
+- **Packet Drops** and **Errors**: No significant errors observed.
+
+### 5. Alarms (Active):
+- There are **no active alarms** reported on your local host, indicating that your system health is currently stable without any outstanding issues.
+
+### Potential Areas to Explore:
+- **High System CPU Utilization**: The CPU usage appears occasionally high—investigate processes that could be consuming excessive resources.
+- **Disk Write Operations** may warrant further examining to ensure applications are not executing inefficiently and to check for signs of issues like overflow or misconfigurations.
+- Consider monitoring the memory swap activity, especially the high amount of memory used in swap; if this is consistently happening, it could impact performance.
+
+### Conclusion:
+Overall, your system appears to be in a stable state with no alarms raised, but CPU and disk usage patterns may need more detailed investigation. If high resource usage continues, it could indicate processes that require optimization or a deeper look into disk configurations.
+
+----------------------------------------------------------------------------------------------------
+You: great - what are the top 5 apps in terms of cpu and ram usage etc?
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "This model's maximum context length is 128000 tokens. However, your messages resulted in 128547 tokens (127795 in the messages, 752 in the functions). Please reduce the length of the messages or functions.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+
+----------------------------------------------------------------------------------------------------
+You: you might need to aggregate some data calls
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "This model's maximum context length is 128000 tokens. However, your messages resulted in 200016 tokens (199264 in the messages, 752 in the functions). Please reduce the length of the messages or functions.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+
+----------------------------------------------------------------------------------------------------
+You: instead of using get current metrics you can do a few individual get chart data calls - ry that
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "Invalid 'messages[10].content': string too long. Expected a string with maximum length 1048576, but got a string with length 2717879 instead.", 'type': 'invalid_request_error', 'param': 'messages[10].content', 'code': 'string_above_max_length'}}
+
+----------------------------------------------------------------------------------------------------
+You: ok - some work to do here...what apps are using most cpu over last hour?
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "This model's maximum context length is 128000 tokens. However, your messages resulted in 168212 tokens (167460 in the messages, 752 in the functions). Please reduce the length of the messages or functions.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+
+----------------------------------------------------------------------------------------------------
+You: use search term to filter the current metrics
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "This model's maximum context length is 128000 tokens. However, your messages resulted in 133894 tokens (133142 in the messages, 752 in the functions). Please reduce the length of the messages or functions.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+
+----------------------------------------------------------------------------------------------------
+You: /save
