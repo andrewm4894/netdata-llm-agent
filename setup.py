@@ -22,7 +22,7 @@ except FileNotFoundError:
 
 setup(
     name="netdata-llm-agent",
-    version="0.3.0",
+    version="0.4.0",
     author="Andrew Maguire",
     author_email="andrewm4894@gmail.com",
     description="A language model agent that interacts with Netdata API",
