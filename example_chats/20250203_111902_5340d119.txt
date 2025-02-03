@@ -1,0 +1,163 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: can you what metrics are most anomalous on each node over the last 30 minutes? give me top 3 per node if any
+----------------------------------------------------------------------------------------------------
+Agent: Here's a summary of the most anomalous metrics over the last 30 minutes for each available node:
+
+### localhost
+Top 3 Anomalous Metrics:
+1. **app.Font_Driver_Host/UMFD-1_cpu_utilization** - Anomaly Rate: 0.9375
+2. **app.NT_AUTHORITY/LOCAL_SERVICE_cpu_utilization** - Anomaly Rate: 0.875
+3. **app.Killer_Analytics_Service_cpu_utilization** - Anomaly Rate: 0.500
+
+### london3.my-netdata.io
+Top 3 Anomalous Metrics:
+1. **app.time_cpu_context_switches** - Anomaly Rate: 0.9778
+2. **app.exim4_cpu_utilization** - Anomaly Rate: 0.9556
+3. **app.systemd_cpu_utilization** - Anomaly Rate: 0.9333 
+
+### bangalore.my-netdata.io
+Error: Timeout while trying to fetch data.
+
+### newyork.my-netdata.io
+Error: Timeout while trying to fetch data.
+
+### sanfrancisco.my-netdata.io
+Error: Timeout while trying to fetch data.
+
+### singapore.my-netdata.io
+Top 3 Anomalous Metrics:
+1. **app.exim4_cpu_utilization** - Anomaly Rate: 0.9556
+2. **app.netdata_disk_logical_io** - Anomaly Rate: 0.9556
+3. **app.debugfs_plugin_disk_logical_io** - Anomaly Rate: 0.9778 
+
+### toronto.my-netdata.io
+Error: Timeout while trying to fetch data.
+
+The requests to some nodes timed out, which is a common issue with network-based queries. Let me know if you need to query again or focus on specific metrics or nodes!
+
+----------------------------------------------------------------------------------------------------
+You: what is cpu on killer analytics service in last little while?
+----------------------------------------------------------------------------------------------------
+Agent: Here's the CPU utilization data for the **Killer Analytics Service** over the last five minutes:
+
+| Time Interval (last 5 mins) | User CPU (%) | System CPU (%) |
+|-----------------------------|--------------|----------------|
+| 0                           | 0.00         | 0.6244         |
+| 1                           | 0.00         | 0.00           |
+| 2                           | 0.00         | 0.00           |
+| 3                           | 0.00         | 0.3159         |
+| 4                           | 0.00         | 0.00           |
+| 5                           | 0.00         | 0.00           |
+| 6                           | 0.00         | 0.00           |
+| 7                           | 0.00         | 0.00           |
+| 8                           | 0.00         | 0.00           |
+| 9                           | 0.00         | 0.00           |
+| 10                          | 0.00         | 1.2507         |
+| 11                          | 0.00         | 0.00           |
+| 12                          | 0.00         | 0.00           |
+| 13                          | 0.00         | 0.00           |
+| 14                          | 0.00         | 0.3090         |
+| 15                          | 0.3159       | 0.00           |
+| 16                          | 0.00         | 0.3121         |
+| 17                          | 0.00         | 0.00           |
+| 18                          | 0.00         | 0.00           |
+| 19                          | 0.00         | 0.00           |
+| 20                          | 0.00         | 0.00           |
+| 21                          | 0.00         | 0.00           |
+| 22                          | 0.00         | 0.00           |
+| 23                          | 0.00         | 0.9277         |
+| 24                          | 0.6236       | 3.4336         |
+| 25                          | 0.00         | 0.00           |
+| 26                          | 0.00         | 0.00           |
+| 27                          | 0.00         | 0.6250         |
+| 28                          | 0.00         | 0.00           |
+| 29                          | 0.00         | 0.00           |
+| 30                          | 0.00         | 0.3134         |
+| 31                          | 0.00         | 0.00           |
+| 32                          | 0.00         | 0.00           |
+| 33                          | 0.00         | 0.00           |
+| 34                          | 0.00         | 0.00           |
+| 35                          | 0.31         | 0.6240         |
+| 36                          | 0.00         | 0.00           |
+| 37                          | 0.00         | 0.00           |
+| 38                          | 0.00         | 0.3127         |
+| 39                          | 0.00         | 0.00           |
+| 40                          | 0.00         | 0.00           |
+| 41                          | 0.00         | 0.00           |
+| 42                          | 0.00         | 0.00           |
+| 43                          | 0.00         | 0.00           |
+| 44                          | 0.00         | 0.00           |
+| 45                          | 0.00         | 1.5670         |
+| 46                          | 0.00         | 0.00           |
+| 47                          | 0.00         | 0.9348         |
+| 48                          | 0.00         | 0.00           |
+| 49                          | 0.00         | 0.00           |
+| 50                          | 0.00         | 0.00           |
+| 51                          | 0.00         | 0.00           |
+| 52                          | 0.00         | 0.3125         |
+| 53                          | 0.00         | 0.00           |
+| 54                          | 0.00         | 0.00           |
+| 55                          | 0.00         | 0.00           |
+| 56                          | 0.00         | 0.00           |
+| 57                          | 0.00         | 0.00           |
+| 58                          | 0.00         | 0.00           |
+| 59                          | 0.00         | 0.00           |
+
+### Summary:
+- The User CPU utilization was mostly 0, with some minor fluctuations.
+- The System CPU utilization mostly ranged between 0% to around 3.43%.
+
+If you need to analyze this further or query another metric, let me know!
+
+----------------------------------------------------------------------------------------------------
+You: what is killer analytics software refering to do you think?
+----------------------------------------------------------------------------------------------------
+Agent: "Killer Analytics" likely refers to an application or service involved in analytics and data collection, potentially for performance monitoring or optimization. The term "Killer" in software titles often implies high performance, effectiveness, or targeting specific use cases that are critical for a business or user.
+
+In this context, "Killer Analytics Service" may deal with:
+
+1. **Data Collection and Analysis**: Gathering metrics and providing insights on system performance, user behavior, or operational efficiency.
+
+2. **Performance Monitoring**: Tracking CPU usage, memory allocation, and other system resources to ensure optimal application performance.
+
+3. **User Engagement Analytics**: Providing insights on user interactions, helping businesses understand user behaviors and improve user experience.
+
+4. **Business Intelligence**: Supporting decision-making through data-driven insights, possibly with features for reporting and visualization.
+
+It could also be part of software that targets optimizing specific applications or services, which aligns with the metrics being gathered (e.g., CPU usage by different application components).
+
+If you have more specific details about "Killer Analytics," I can provide more tailored insights!
+
+----------------------------------------------------------------------------------------------------
+You: i think its some network utility on my dell
+----------------------------------------------------------------------------------------------------
+Agent: If "Killer Analytics" is indeed a network utility associated with your Dell device, it is likely part of the **Killer Networking** suite. Killer Networking applications typically provide features related to enhancing network performance, particularly for gaming and streaming. Here are some common functions of Killer Networking software:
+
+1. **Network Prioritization**: The utility allows users to prioritize certain applications or types of traffic (like gaming or video streaming) to ensure they receive the necessary bandwidth for optimal performance.
+
+2. **Real-time Analytics**: It often provides analytics on network usage, showing which applications are consuming bandwidth and how network performance can be optimized.
+
+3. **Network Monitoring**: Users can monitor their network's health, including connection quality, latency, and packet loss.
+
+4. **Game Mode**: Some versions offer modes specifically designed to optimize gaming performance by minimizing latency and enhancing connection stability.
+
+5. **Driver Management**: Killer Networking utilities typically include tools for managing and updating network drivers to ensure compatibility with the latest protocols and performance improvements.
+
+6. **Customization Options**: Users can customize network settings based on their preferences and needs, which is especially useful for gamers and heavy internet users.
+
+If this utility is running on your Dell machine, it is likely designed to help improve your internet experience, especially in environments where network performance is crucial. If you need more specific information or functionality related to "Killer Analytics," feel free to ask!
+
+----------------------------------------------------------------------------------------------------
+You: k - ill go look at it
+----------------------------------------------------------------------------------------------------
+Agent: Sounds good! If you have any questions or need assistance with anything related to "Killer Analytics" or any other topic, feel free to reach out. Happy exploring!
+
+----------------------------------------------------------------------------------------------------
+You: /save

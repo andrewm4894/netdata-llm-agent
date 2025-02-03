@@ -1,0 +1,150 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: any active alarms on my hosts?
+----------------------------------------------------------------------------------------------------
+Agent: Here are the active alarms across your hosts:
+
+### 1. **localhost:19999**
+- No active alarms.
+
+### 2. **london3.my-netdata.io**
+- **Alarm:** System requires reboot after package updates
+  - **Status:** WARNING
+  - **Value:** 1 (requires reboot)
+  - **Info:** System requires reboot after package updates
+
+- **Alarm:** Web log successful
+  - **Status:** WARNING
+  - **Value:** 88.50%
+  - **Info:** Ratio of successful HTTP requests over the last minute
+
+### 3. **bangalore.my-netdata.io**
+- **Alarm:** QOS packet drops
+  - **Status:** WARNING
+  - **Value:** 1 packet
+  - **Info:** Dropped packets in the last 5 minutes
+
+- **Alarm:** Web log unparsed
+  - **Status:** WARNING
+  - **Value:** 3.35%
+  - **Info:** Percentage of unparsed log lines over the last minute
+
+### 4. **newyork.my-netdata.io**
+- **Alarm:** QOS packet drops
+  - **Status:** WARNING
+  - **Value:** 3 packets
+  - **Info:** Dropped packets in the last 5 minutes
+
+### 5. **sanfrancisco.my-netdata.io**
+- **Alarm:** QOS packet drops
+  - **Status:** WARNING
+  - **Value:** 2 packets
+  - **Info:** Dropped packets in the last 5 minutes
+
+### 6. **singapore.my-netdata.io**
+- **Alarm:** Web log unparsed
+  - **Status:** WARNING
+  - **Value:** 1.36%
+  - **Info:** Percentage of unparsed log lines over the last minute
+
+### 7. **toronto.my-netdata.io**
+- No active alarms.
+
+If you need more details about any specific alarm or host, let me know!
+
+----------------------------------------------------------------------------------------------------
+You: which one is top prioirty?
+----------------------------------------------------------------------------------------------------
+Agent: The priority of alarms can generally be assessed based on their "status," "value," and accompanying "info." Typically, alarms that indicate system issues or potential service disruptions are considered higher priority. Here’s a breakdown based on the fetched alarms:
+
+### High Priority Alarms
+1. **london3.my-netdata.io:**
+   - **Alarm:** System requires reboot after package updates
+     - **Status:** WARNING
+     - **Value:** 1 (requires reboot)
+     - **Info:** System requires reboot after package updates
+     - **Priority:** **High** (System stability and operational readiness are compromised)
+
+### Moderate Priority Alarms
+2. **london3.my-netdata.io:**
+   - **Alarm:** Web log successful
+     - **Status:** WARNING
+     - **Value:** 88.50%
+     - **Info:** Ratio of successful HTTP requests over the last minute
+     - **Priority:** **Moderate**
+
+3. **bangalore.my-netdata.io:**
+   - **Alarm:** QOS packet drops
+     - **Status:** WARNING
+     - **Value:** 1 packet
+     - **Info:** Dropped packets in the last 5 minutes
+     - **Priority:** **Moderate**
+   
+4. **bangalore.my-netdata.io:**
+   - **Alarm:** Web log unparsed
+     - **Status:** WARNING
+     - **Value:** 3.35%
+     - **Info:** Percentage of unparsed log lines over the last minute
+     - **Priority:** **Moderate**
+
+5. **newyork.my-netdata.io:**
+   - **Alarm:** QOS packet drops
+     - **Status:** WARNING
+     - **Value:** 3 packets
+     - **Info:** Dropped packets in the last 5 minutes
+     - **Priority:** **Moderate**
+
+6. **sanfrancisco.my-netdata.io:**
+   - **Alarm:** QOS packet drops
+     - **Status:** WARNING
+     - **Value:** 2 packets
+     - **Info:** Dropped packets in the last 5 minutes
+     - **Priority:** **Moderate**
+
+7. **singapore.my-netdata.io:**
+   - **Alarm:** Web log unparsed
+     - **Status:** WARNING
+     - **Value:** 1.36%
+     - **Info:** Percentage of unparsed log lines over the last minute
+     - **Priority:** **Moderate**
+
+### Conclusion
+The **highest priority alarm** is the **System requires reboot after package updates** on **london3.my-netdata.io** due to its potential impact on system stability. 
+
+If you need assistance in resolving this alarm or further investigation, let me know!
+
+----------------------------------------------------------------------------------------------------
+You: what does the web log unparsed alarm mean?
+----------------------------------------------------------------------------------------------------
+Agent: The **Web log unparsed alarm** refers to the percentage of unparsed log lines in the web server logs. Specifically, it monitors the **excluded requests** dimension in the web log statistics.
+
+### Details about the Alarm:
+- **Chart Name:** Excluded Requests
+- **Metric:** Percentage of unparsed log lines over the last minute.
+- **Units:** %
+- **Current Value:** This alarm was triggered at a value of 3.35% for the **bangalore.my-netdata.io** host, indicating that 3.35% of requests over the last minute were unmatched or not properly parsed by the server's logging mechanism.
+
+### What it means:
+- When a certain percentage of log entries are unparsed or excluded, it typically indicates that the web server received requests that did not match any existing rules in the log configuration. This can happen for various reasons, such as:
+  - **Unknown Request Formats:** The request format does not conform to expected patterns.
+  - **Configuration Issues:** The logging configuration might need adjustments to handle new types of requests.
+  - **Elemental Quality of Traffic:** There could be potential bot traffic or malformed requests hitting the server.
+
+### Importance of Monitoring:
+Monitoring this metric is crucial as unparsed requests can lead to gaps in the logs where important data about user behavior, errors, or traffic patterns might be missed. Consistent unparsed entries might necessitate a review of logging configurations to ensure all relevant requests are being recorded properly.
+
+If you need additional analysis or recommendations regarding this alarm or adjustments needed, feel free to ask!
+
+----------------------------------------------------------------------------------------------------
+You: k thanks /save
+----------------------------------------------------------------------------------------------------
+Agent: You're welcome! If you have any more questions in the future or need further assistance, feel free to reach out. Have a great day!
+
+----------------------------------------------------------------------------------------------------
+You: /save
