@@ -47,16 +47,19 @@ def get_info(netdata_host_url: str) -> str:
     return json.dumps(info, indent=2)
 
 
-def get_charts(netdata_host_url: str, search_term: str = None) -> str:
+def get_charts(
+    netdata_host_url: str, search_term: str = None, include_dimensions: bool = False
+) -> str:
     """
     Calls Netdata /api/v1/charts to retrieve the list of available charts and some metadata about each chart. Use the search_term to filter the charts if needed.
 
     Args:
         netdata_host_url: Netdata host url to call.
         search_term: Optional search term to filter the charts returned.
+        include_dimensions: If True, include the dimensions for each chart in the returned JSON.
 
     Returns:
-        JSON string with chart metadata. List of tuples with chart id and title.
+        JSON string with chart metadata. List of tuples with chart id and title and dimensions if include_dimensions is True.
     """
     url = f"{netdata_host_url}/api/v1/charts"
     resp = requests.get(url, timeout=5)
@@ -64,11 +67,20 @@ def get_charts(netdata_host_url: str, search_term: str = None) -> str:
 
     charts = []
     for chart in r_json["charts"]:
-        if search_term and search_term not in r_json["charts"][chart]["name"]:
+        if (
+            search_term
+            and search_term not in r_json["charts"][chart]["name"]
+            and search_term not in r_json["charts"][chart]["title"]
+            and not any(search_term in dim for dim in r_json["charts"][chart]["dimensions"].keys())
+        ):
             continue
-        charts.append(
-            (r_json["charts"][chart]["name"], r_json["charts"][chart]["title"])
-        )
+        chart_info = (r_json["charts"][chart]["name"], r_json["charts"][chart]["title"])
+        if include_dimensions:
+            chart_info = (
+                *chart_info,
+                list(r_json["charts"][chart]["dimensions"].keys()),
+            )
+        charts.append(chart_info)
 
     return json.dumps(charts, indent=2)
 
