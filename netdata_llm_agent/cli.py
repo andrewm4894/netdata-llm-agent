@@ -71,10 +71,11 @@ def print_and_save_message(message, chat_history, separator=True, is_markdown=Fa
 
     chat_history.append("─" * 50)
     chat_history.append("")
-    chat_history.append(message)
+    chat_history.append(message + '\n')
     chat_history.append("")
     chat_history.append("─" * 50)
     chat_history.append("")
+
 
 
 def get_chat_title(agent, chat_history):
@@ -143,7 +144,7 @@ def main():
     while True:
         try:
             user_input = console.input("[bold green]You:[/bold green] ").strip()
-            chat_history.append(f"\nYou: {user_input}")
+            chat_history.append(f"\nYou: {user_input}\n")
         except (KeyboardInterrupt, EOFError):
             print_and_save_message("\nExiting...", chat_history)
             break

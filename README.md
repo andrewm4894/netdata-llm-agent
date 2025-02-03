@@ -70,98 +70,81 @@ make cli
 netdata-llm-cli
 ```
 
-```markdown
-Welcome to the Netdata LLM Agent CLI!
-Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
-Type 'exit' or 'quit' to end the session.
+```text
+(venv) PS C:\Users\andre\Documents\repos\netdata-llm-agent> netdata-llm-cli
+──────────────────────────────────────────────────
 
-You: how do the mysql metrics look on london?
-Agent: In the London Netdata instance, there are numerous MySQL-related metrics available for monitoring. Here's a comprehensive list:
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                               Welcome to the Netdata LLM Agent CLI!                                               ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-1. User Process Metrics:
-   - `user.mysql_cpu_utilization`: CPU utilization.
-   - `user.mysql_mem_private_usage`: Memory usage without shared.
-   - `user.mysql_cpu_context_switches`: CPU context switches.
-   - `user.mysql_mem_usage`: Memory RSS usage.
-   - `user.mysql_vmem_usage`: Virtual memory size.
-   - `user.mysql_mem_page_faults`: Memory page faults.
-   - `user.mysql_swap_usage`: Swap usage.
-   - `user.mysql_disk_physical_io`: Disk physical IO.
-   - `user.mysql_disk_logical_io`: Disk logical IO.
-   - `user.mysql_processes`: Number of processes.
-   - `user.mysql_threads`: Number of threads.
-   - `user.mysql_fds_open_limit`: Open file descriptors limit.
-   - `user.mysql_fds_open`: Open files descriptors.
-   - `user.mysql_uptime`: Uptime.
+ • Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter
+ • Type /exit, /quit or /bye to end the session
+ • Type /save to save the chat history to a file
+ • Type /good to save with good_ prefix, /bad to save with bad_ prefix (useful for debugging in langsmith)
+ • Type /reset to clear chat history and restart the agent
 
-2. User Group Process Metrics (Similar metrics for group processes):
-   - CPU, memory, IO, and process-related metrics.
+──────────────────────────────────────────────────
 
-3. General MySQL Metrics:
-   - `mysql_local.net`: Bandwidth.
-   - `mysql_local.queries`: Queries per second.
-   - `mysql_local.queries_type`: Types of queries.
-   - `mysql_local.handlers`: Handlers.
-   - `mysql_local.table_locks`: Table locks.
-   - `mysql_local.join_issues`: Join issues.
-   - `mysql_local.sort_issues`: Sort issues.
-   - `mysql_local.tmp`: Temporary operations.
-   - `mysql_local.connections`: Total connections.
-   - `mysql_local.connections_active`: Active connections.
-   - `mysql_local.threads`: Number of threads.
-   - `mysql_local.thread_cache_misses`: Thread cache misses.
-   - `mysql_local.innodb_io`: InnoDB I/O bandwidth.
-   - `mysql_local.innodb_io_ops`: InnoDB I/O operations.
-   - `mysql_local.innodb_io_pending_ops`: InnoDB pending I/O operations.
-   - `mysql_local.innodb_log`: InnoDB log operations.
-   - `mysql_local.innodb_cur_row_lock`: InnoDB current row locks.
-   - `mysql_local.innodb_rows`: InnoDB row operations.
-   - Other InnoDB metrics related to buffer pool and page requests.
-   - `mysql_local.files`: Open files.
-   - `mysql_local.files_rate`: Opened files rate.
-   - `mysql_local.connection_errors`: Connection errors.
-   - `mysql_local.opened_tables`: Number of opened tables.
-   - `mysql_local.process_list_queries_count`: Queries count.
-   - `mysql_local.innodb_deadlocks`: InnoDB deadlocks.
-   - QCache and MyISAM-related metrics.
+You: how are mysql metrics looking on london over the last 15 minutes - anythinng to worry about?
+──────────────────────────────────────────────────
 
-These metrics provide a detailed view of MySQL performance and can be used to monitor the database server's status, resource usage, and performance trends. If you'd like more detailed info on any specific chart, feel free to ask!
+Agent: Here's a summary of the MySQL metrics from the London Netdata host over the last 15 minutes:
 
-You: how does performance generaly look?
-Agent: The current performance metrics for MySQL on the London Netdata instance indicate relatively stable and low resource usage. Here's a summary of key metrics:
+ 1 CPU Utilization
+    • User CPU Utilization: Ranges between 0.209542 to 0.379086, indicating a stable utilization around 30-37%.
+    • System CPU Utilization: Mostly around 0 indicating very low system-level CPU usage.
+ 2 Memory Usage
+    • RSS Memory Usage: Remains constant at 234.918 MB throughout the sampling period.
+ 3 Active Connections
+    • There has been a maximum of 1 active connection with a limit of 151 connections and maximum throughput of 2 active connections.
+ 4 InnoDB Deadlocks
+    • There were 0 deadlocks recorded, indicating no issues related to deadlocks during this time span.
 
-### CPU and Memory Utilization
-- **CPU Utilization**: Very low at around 0.61% for system usage, with no user CPU usage.
-- **Memory Usage**:
-  - Private memory usage is about 226 MiB.
-  - RSS memory usage is around 234.95 MiB.
-  - Virtual memory usage is approximately 1174 MiB.
+                                                             Conclusion:
 
-### Disk I/O
-- **Physical I/O**: Minimal, with writes noted at around -24 KiB/s.
-- **Logical I/O**: Slightly more activity with reads at 8.46 KiB/s and writes at -32.18 KiB/s.
+Overall, the MySQL metrics in London indicate normal operation with no alarming signs:
 
-### Network and Query Activity
-- **Network Bandwidth**: Inbound traffic is around 4.76 kb/s, while outbound traffic is -179.86 kb/s.
-- **Queries**:
-  - Handling around 6 queries/second with a mix of select operations (1 query/second) and some sorting and joining activities.
+ • CPU and memory usage are stable and well within acceptable limits.
+ • Active connections are within the operational ceiling.
+ • No deadlocks were recorded.
 
-### Processes and Threads
-- **Processes**: Running 1 MySQL process with 9 threads active.
-- **Connections**: 1 active connection with a limit of 151.
+There doesn't appear to be anything to worry about based on the current metrics.
 
-### Cache and Buffers
-- **Buffer Pool**: Utilized pages are minor with a total of 8064 pages, suggesting ample buffer pool size compared to usage.
-- **QCache**: Limited operation, with free memory at 0.98 MiB.
+──────────────────────────────────────────────────
 
-### Miscellaneous
-- **Swap Usage**: Not utilizing any swap memory.
-- **InnoDB Deadlocks**: No deadlocks detected.
+You: how do nginx metrics look over same timerange on that node?
+──────────────────────────────────────────────────
 
-Overall, the system exhibits nominal activity levels indicating a stable and lightly loaded MySQL server. If there's a need for deeper analysis on specific metrics or additional monitoring, feel free to ask for more details.
+Agent: Here's a summary of the Nginx metrics from the London Netdata host over the last 15 minutes:
 
-You: thats great thanks! love you x
-Agent: You're welcome! I'm glad I could help. If you have any more questions or need assistance in the future, feel free to reach out. Have a fantastic day! 😊
+ 1 Total Requests
+    • The total client requests have fluctuated between 8.06 and 18.06 requests per minute, indicating a stable request traffic.
+ 2 Active Client Connections
+    • Active client connections have varied from 147 to 182. This shows that the server is handling a consistent level of active
+      connections, peaking occasionally.
+ 3 Connection Statuses
+    • The connection statuses indicate that the majority of active connections are in an idle state, with a slight activity detected
+      in read and write operations.
+ 4 CPU Utilization
+    • Nginx CPU utilization has reached a maximum of approximately 0.367 (user) and 0.339 (system), demonstrating efficient CPU usage
+      without signs of strain.
+ 5 Memory Usage
+    • Nginx memory usage has remained stable around 43.8 MB of RAM with no swap memory usage detected, which is optimal.
+
+                                                             Conclusion:
+
+The Nginx metrics on the London node appear to be stable and efficient:
+
+ • Request load and active connections are well managed.
+ • CPU and memory usage are both maintained at reasonable levels.
+
+Overall, there doesn’t seem to be anything concerning based on the current Nginx metrics.
+
+──────────────────────────────────────────────────
+
+You: /good
+Chat history saved to: example_chats/good_MySQL_and_Nginx_Metrics_Summary_20250203_135458_403cf2dc.md
 ```
 
 ## Code Example
