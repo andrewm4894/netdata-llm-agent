@@ -7,15 +7,17 @@ A simple CLI for interacting with the Netdata LLM Agent.
 
 import argparse
 import os
-import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from netdata_llm_agent.agent import NetdataLLMAgent
+from enum import Enum
 
 load_dotenv()
+
+SEPARATOR_TEXT = "─" * 50 + "  \n"
 
 console = Console()
 
@@ -56,8 +58,7 @@ def parse_args():
 def print_and_save_message(message, chat_history, separator=True, is_markdown=False):
     """Print a message and add it to chat history."""
     if separator:
-        console.print("─" * 50, style="dim")
-        console.print()
+        console.print(SEPARATOR_TEXT, style="dim")
 
     if is_markdown:
         console.print(Markdown(message))
@@ -65,17 +66,11 @@ def print_and_save_message(message, chat_history, separator=True, is_markdown=Fa
         console.print(message)
 
     if separator:
-        console.print()
-        console.print("─" * 50, style="dim")
-        console.print()
+        console.print(SEPARATOR_TEXT, style="dim")
 
-    chat_history.append("─" * 50)
-    chat_history.append("")
+    chat_history.append(SEPARATOR_TEXT)
     chat_history.append(message + '\n')
-    chat_history.append("")
-    chat_history.append("─" * 50)
-    chat_history.append("")
-
+    chat_history.append(SEPARATOR_TEXT)
 
 
 def get_chat_title(agent, chat_history):
@@ -114,21 +109,129 @@ def get_chat_title(agent, chat_history):
         return "untitled_chat"
 
 
+class Command(Enum):
+    EXIT = ["/exit", "/quit", "/bye"]
+    RESET = "/reset"
+    SAVE = "/save"
+    SAVE_GOOD = "/good"
+    SAVE_BAD = "/bad"
+
+class ChatCLI:
+    def __init__(self, agent):
+        self.agent = agent
+        self.chat_history = ChatHistory()
+        self.console = Console()
+
+    def handle_command(self, user_input):
+        """Handle CLI commands and return True if command was handled."""
+        if user_input.lower() in Command.EXIT.value:
+            self._handle_exit()
+            return True
+
+        if user_input.lower() == Command.RESET.value:
+            self._handle_reset()
+            return True
+
+        if user_input.lower() in [Command.SAVE.value, Command.SAVE_GOOD.value, Command.SAVE_BAD.value]:
+            self._handle_save(user_input.lower())
+            return True
+
+        return False
+
+    def _handle_exit(self):
+        self.console.print("[yellow]Goodbye![/yellow]")
+        self.chat_history.add_message("Goodbye!")
+
+    def _handle_reset(self):
+        self.chat_history.clear()
+        self.agent = NetdataLLMAgent(netdata_host_urls=self.agent.netdata_host_urls, model=self.agent.model)
+        self.console.print("[green]Chat history cleared and agent reinitialized![/green]")
+        self.chat_history.add_message("Chat history cleared and agent reinitialized!")
+
+    def _handle_save(self, command):
+        os.makedirs("example_chats", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        chat_title = get_chat_title(self.agent, self.chat_history.messages)
+
+        prefix = ""
+        if command in [Command.SAVE_GOOD.value, Command.SAVE_BAD.value]:
+            prefix = f"{command[1:]}_"
+
+        filename = f"example_chats/{prefix}{timestamp}__{chat_title}.md"
+        self.chat_history.save_to_file(filename)
+
+        save_message = f"Chat history saved to: {filename}"
+        self.console.print(f"[blue]{save_message}[/blue]")
+        self.chat_history.add_message(save_message, quiet=True)
+
+    def add_user_message(self, message):
+        """Add a user message to the chat history."""
+        self.chat_history.add_message(f"You: {message}\n", separator=True, quiet=True)
+
+    def add_agent_message(self, message):
+        """Add an agent message to the chat history."""
+        self.chat_history.add_message(f"Agent: {message}\n", is_markdown=True)
+
+
+class ChatHistory:
+    def __init__(self):
+        self.messages = []
+        self.console = Console()
+
+    def add_message(self, message, separator=True, is_markdown=False, quiet=False):
+        """
+        Add a message to chat history and optionally print it.
+
+        Args:
+            message: The message to add
+            separator: Whether to print separator lines
+            is_markdown: Whether to render the message as markdown
+            quiet: If True, don't print the message (just add to history)
+        """
+        if not quiet:
+            if separator:
+                self.console.print(SEPARATOR_TEXT, style="dim")
+
+            if is_markdown:
+                self.console.print(Markdown(message))
+            else:
+                self.console.print(message)
+
+            if separator:
+                self.console.print(SEPARATOR_TEXT, style="dim")
+
+        self.messages.extend([
+            SEPARATOR_TEXT if separator else "",
+            message + '\n',
+            ""
+        ])
+
+    def clear(self):
+        """Clear the chat history."""
+        self.messages.clear()
+
+    def save_to_file(self, filename):
+        """Save chat history to a file."""
+        with open(filename, "w", encoding="utf-8") as f:
+            for entry in self.messages:
+                if entry:
+                    f.write(f"{entry}\n")
+
+
 def main():
     """Main function for the CLI."""
-
     args = parse_args()
     agent = NetdataLLMAgent(netdata_host_urls=args.host, model=args.model)
-
-    chat_history = []
+    cli = ChatCLI(agent)
 
     if args.question:
         try:
             response = agent.chat(args.question, return_last=True, no_print=True)
-            print_and_save_message(f"Agent: {response}\n", chat_history, is_markdown=True)
+            cli.add_agent_message(response)
         except Exception as e:
-            console.print(f"[red]An error occurred while processing your question: {e}[/red]\n")
-            chat_history.append(f"An error occurred while processing your question: {e}\n")
+            error_msg = f"An error occurred while processing your question: {e}\n"
+            console.print(f"[red]{error_msg}[/red]")
+            cli.chat_history.add_message(error_msg)
         return
 
     welcome_message = """# Welcome to the Netdata LLM Agent CLI!
@@ -139,61 +242,33 @@ def main():
 - Type `/good` to save with good_ prefix, `/bad` to save with bad_ prefix (useful for debugging in langsmith)
 - Type `/reset` to clear chat history and restart the agent
 """
-    print_and_save_message(welcome_message, chat_history, is_markdown=True)
+    cli.chat_history.add_message(welcome_message, is_markdown=True)
 
     while True:
         try:
-            user_input = console.input("[bold green]You:[/bold green] ").strip()
-            chat_history.append(f"\nYou: {user_input}\n")
+            user_input = cli.console.input("[bold green]You:[/bold green] ").strip()
+            cli.add_user_message(user_input)
         except (KeyboardInterrupt, EOFError):
-            print_and_save_message("\nExiting...", chat_history)
+            cli.chat_history.add_message("\nExiting...")
             break
-
-        if user_input.lower() in ("/exit", "/quit", "/bye"):
-            console.print("[yellow]Goodbye![/yellow]")
-            chat_history.append("Goodbye!")
-            break
-
-        if user_input.lower() == "/reset":
-            chat_history = []
-            agent = NetdataLLMAgent(netdata_host_urls=args.host, model=args.model)
-            console.print("[green]Chat history cleared and agent reinitialized![/green]")
-            chat_history.append("Chat history cleared and agent reinitialized!")
-            continue
-
-        if user_input.lower() in ("/save", "/good", "/bad"):
-            os.makedirs("example_chats", exist_ok=True)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-            chat_title = get_chat_title(agent, chat_history)
-
-            prefix = ""
-            if user_input.lower() in ("/good", "/bad"):
-                prefix = f"{user_input[1:]}_"
-
-            filename = f"example_chats/{prefix}{chat_title}_{timestamp}_{str(uuid.uuid4())[:8]}.md"
-
-            with open(filename, "w", encoding="utf-8") as f:
-                for entry in chat_history:
-                    f.write(f"{entry}\n")
-
-            console.print(f"[blue]Chat history saved to: {filename}[/blue]")
-            chat_history.append(f"Chat history saved to: {filename}")
-            continue
 
         if not user_input:
+            continue
+
+        if cli.handle_command(user_input):
+            if user_input.lower() in Command.EXIT.value:
+                break
             continue
 
         try:
             response = agent.chat(
                 user_input, return_last=True, no_print=True, continue_chat=True
             )
-            print_and_save_message(f"Agent: {response}\n", chat_history, is_markdown=True)
-
+            cli.add_agent_message(response)
         except Exception as e:
             error_msg = f"An error occurred while processing your request: {e}\n"
             console.print(f"[red]{error_msg}[/red]")
-            chat_history.append(error_msg)
+            cli.chat_history.add_message(error_msg)
 
 
 if __name__ == "__main__":
