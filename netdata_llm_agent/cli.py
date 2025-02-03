@@ -57,7 +57,7 @@ def print_and_save_message(message, chat_history, separator=True, is_markdown=Fa
     """Print a message and add it to chat history."""
     if separator:
         console.print("─" * 75, style="dim")
-        console.print()  # Add newline after separator
+        console.print()
 
     if is_markdown:
         console.print(Markdown(message))
@@ -65,16 +65,16 @@ def print_and_save_message(message, chat_history, separator=True, is_markdown=Fa
         console.print(message)
 
     if separator:
-        console.print()  # Add newline before separator
+        console.print()
         console.print("─" * 75, style="dim")
-        console.print()  # Add newline after separator
+        console.print()
 
     chat_history.append("─" * 75)
-    chat_history.append("")  # Add newline in saved history
+    chat_history.append("")
     chat_history.append(message)
-    chat_history.append("")  # Add newline in saved history
+    chat_history.append("")
     chat_history.append("─" * 75)
-    chat_history.append("")  # Add newline in saved history
+    chat_history.append("")
 
 
 def get_chat_title(agent, chat_history):
