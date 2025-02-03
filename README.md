@@ -18,7 +18,7 @@ An LLM agent for chatting with your netdata server's.
 
 See [example notebook](./notebooks/examples.ipynb) for more updated examples or check out some of the example chats in the [example_chats](./example_chats) folder.
 
-Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_agent/tools.py)):
+Tools the [agent](./netdata_llm_agent/agent.py) has access to ([source](./netdata_llm_agent/tools.py)):
 - `get_info(netdata_host_url)` : Get Netdata info about a node.
 - `get_charts(netdata_host_url, search_term)` : Get Netdata charts, optionally filter by search_term.
 - `get_chart_info(netdata_host_url, chart)` : Get Netdata chart info for a specific chart.
