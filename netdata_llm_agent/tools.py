@@ -55,7 +55,7 @@ def get_charts(
 
     Args:
         netdata_host_url: Netdata host url to call.
-        search_term: Optional search term to filter the charts returned.
+        search_term: Optional search term to filter the charts returned based on chart name, title, or dimensions.
         include_dimensions: If True, include the dimensions for each chart in the returned JSON.
 
     Returns:
