@@ -1,0 +1,66 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: what app is using most cpu over the last hour on local host?
+----------------------------------------------------------------------------------------------------
+Agent: It seems that there are no application-level CPU charts available on the local host. However, I can check the overall CPU usage for the system if that would help. Would you like me to do that?
+
+----------------------------------------------------------------------------------------------------
+You: there are app specific charts - use the charts tool to find them
+----------------------------------------------------------------------------------------------------
+An error occurred while processing your request: Error code: 400 - {'error': {'message': "This model's maximum context length is 128000 tokens. However, your messages resulted in 141505 tokens (140753 in the messages, 752 in the functions). Please reduce the length of the messages or functions.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+
+----------------------------------------------------------------------------------------------------
+You: use search term
+----------------------------------------------------------------------------------------------------
+Agent: Here's the CPU utilization data for different applications over the last hour on the local host:
+
+1. **Windows Audio**:
+   - User CPU: 2.75
+   - System CPU: 1.84
+
+2. **Google Chrome**:
+   - User CPU: 1.41
+   - System CPU: 0.35
+
+3. **Microsoft Edge**:
+   - User CPU: 0.22
+   - System CPU: 0.26
+
+4. **WinFsp Launcher**:
+   - User CPU: 0.00
+   - System CPU: 0.01
+
+5. **Windows Explorer**:
+   - User CPU: 0.00 
+   - System CPU: 0.02
+
+From this data, it appears that **Windows Audio** used the most CPU resources in the last hour, with a user CPU utilization of approximately 2.75 and system CPU utilization of 1.84. 
+
+Would you like to see more details or check other applications?
+
+----------------------------------------------------------------------------------------------------
+You: what is windows audio?
+----------------------------------------------------------------------------------------------------
+Agent: The **Windows Audio** chart monitors CPU utilization related to the Windows Audio service. Here are the details:
+
+- **Chart Title**: Applications Groups CPU utilization (100% = 1 core)
+- **ID**: app.Windows_Audio_cpu_utilization
+- **Units**: Percentage
+- **Family**: CPU
+- **Context**: Application CPU utilization
+- **Dimensions**:
+  - **User**: Represents the percentage of CPU used by user processes.
+  - **System**: Represents the percentage of CPU used by system processes.
+
+This chart is useful for tracking how much CPU resources are consumed by the Windows Audio service, which is responsible for managing audio playback and recording in Windows.
+
+Would you like to explore this chart further or have any specific questions?
+
+----------------------------------------------------------------------------------------------------
+You: /save

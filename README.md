@@ -16,7 +16,7 @@ An LLM agent for chatting with your netdata server's.
 - [CLI](#cli-example) - A very simplistic cli tool that uses the agent to chat with your netdata server's on command line.
 - [Code](#code-example) - A code example of how to chat with the agent in python.
 
-See [example notebook](./notebooks/examples.ipynb) for more updated examples.
+See [example notebook](./notebooks/examples.ipynb) for more updated examples or check out some of the example chats in the [example_chats](./example_chats) folder.
 
 Tools the [agent](./netdata_llm_agent.py) has access to ([source](./netdata_llm_agent/tools.py)):
 - `get_info(netdata_host_url)` : Get Netdata info about a node.

@@ -1,0 +1,53 @@
+----------------------------------------------------------------------------------------------------
+Welcome to the Netdata LLM Agent CLI!
+Type your query about Netdata (e.g., charts, alarms, metrics) and press Enter.
+Type '/exit', '/quit' or '/bye' to end the session.
+Type '/save' to save the chat history to a file.
+Type '/reset' to clear chat history and restart the agent.
+
+----------------------------------------------------------------------------------------------------
+You: how are the mysql metrics looking on london over the last 15 minutes?
+----------------------------------------------------------------------------------------------------
+Agent: Here are the MySQL metrics from London over the last 15 minutes:
+
+1. **CPU Utilization (User Processes)**:
+   - Average CPU Utilization: The user CPU utilization fluctuated around **0.30 to 0.39** (out of a maximum of 1.0).
+
+2. **Memory Usage (User Processes)**:
+   - RSS Memory Usage: It remained constant at **236.918 MB**.
+
+3. **Queries**:
+   - Queries per second: The queries per second varied between **4.99 to 5.06**. There were **0 slow queries** reported.
+
+4. **Connections**:
+   - Current active connections: The active connections were consistently at **0.0**.
+
+5. **InnoDB I/O Operations**:
+   - Reads, writes, and fsyncs were all at **0.0**, indicating that there were no read/write operations occurring during this time.
+
+Overall, the MySQL metrics indicate that the system is under light load with stable memory usage, consistent query handling, and minimal I/O operations in the last 15 minutes.
+
+----------------------------------------------------------------------------------------------------
+You: how do the nginx metrics look?
+----------------------------------------------------------------------------------------------------
+Agent: Here are the Nginx metrics from London over the last 15 minutes:
+
+1. **Client Requests**:
+   - Total Requests: The requests varied around **7 to 15** requests per second, with fluctuations throughout the period.
+
+2. **Active Connections**:
+   - Average Active Connections: The active client connections (including waiting connections) ranged from approximately **130 to 159** connections.
+
+3. **Connection Statuses**:
+   - The connection statuses showed a distribution with very few readings for idle connections compared to active ones, implying the connections were often in use rather than idle.
+
+4. **CPU Utilization (Systemd Nginx)**:
+   - The CPU utilization for the Nginx service observed user percentage around **0.09 to 0.28** and system percentage up to **0.33**.
+
+5. **Memory Usage (Systemd Nginx)**:
+   - The used memory was steady around **28.96 to 29.06 MB**, indicating consistent memory utilization.
+
+In summary, the Nginx metrics indicate a stable number of requests and active connections with reasonable CPU and memory usage over the last 15 minutes.
+
+----------------------------------------------------------------------------------------------------
+You: /save
