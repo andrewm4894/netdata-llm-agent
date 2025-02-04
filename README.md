@@ -16,6 +16,7 @@ An LLM agent for chatting with your netdata server's.
 - [CLI](#cli-example) - A very simplistic cli tool that uses the agent to chat with your netdata server's on command line.
 - [Code](#code-example) - A code example of how to chat with the agent in python.
 - Ollama - Can use local models via [Ollama](https://ollama.com/) (via [LangChain](https://python.langchain.com/docs/integrations/providers/ollama/)).
+- [Source](./netdata-llm-agent/agent.py) - start here to explore the code - really its just [tools.py](./netdata-llm-agent/tools.py) to define various tools over the api and docs etc. and [agent.py](./netdata-llm-agent/agent.py) to use those tools and system prompt to make a `NetdataLLMAgent` class.
 
 See [example notebook](./notebooks/examples.ipynb) for more updated examples or check out some of the example chats in the [example_chats](./example_chats) folder.
 
