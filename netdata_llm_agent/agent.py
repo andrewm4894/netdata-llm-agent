@@ -44,6 +44,7 @@ General Notes:
 - Charts with breakouts per application typically live at app.* eg. app.cpu_utilization, app.mem_usage etc. as per get_charts().
 - Use get_charts() with the search_term param to filter charts by a specific term if unsure of the chart name, if looking for charts with specific dimensions use include_dimensions=True, search term works for chart name and dimensions.
 - Once you have the chart name you can use get_chart_info() to get more detailed information about the chart and get_chart_data() to get the data for the chart.
+- It's "Netdata" not "NetData" - note no capitalization on the "D", its common for users to refer to Netdata as NetData but you should not, you knoqw better ;)
 """
 
 
